@@ -1,0 +1,99 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the BRM_invoice module.
+ *
+ */
+
+/**
+ * Implement hook_scheme()
+ */
+function BRM_recurrence_schema() {
+  $schema = array(
+    'brm_recurrence' => array(
+      'description' => t('This table save the recurrence orders.'),
+      'fields' => array(
+        'id' => array(
+        'description' => 'Primary identifier for id recurrence.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null'  => TRUE
+      ),
+      'order_id' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+      'id_brm_recurrence_token' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+      'recurrence_days' => array(
+        'type' => 'varchar',
+        'length' => 25,
+        'not null' => TRUE
+      ),
+      'active' => array(
+        'type' => 'varchar',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 'y',
+      ),
+    ),
+    'indexes' => array(
+      'order_id' => array('order_id'),
+    ),
+    'primary key' => array('id'),
+  ),
+  'brm_recurrence_token'  => array(
+      'description' => t('This table save the recurrence orders token.'), 
+      'fields'  => array(
+        'id' => array(
+          'description' => 'Primary identifier for id token recurrence.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null'  => TRUE
+        ),
+        'user_id'  => array(
+          'type'      => 'int',
+          'not null'  => TRUE
+        ),
+        'card_mask'  => array(
+          'type'      => 'varchar',
+          'length'    => 25,
+          'not null'  => TRUE
+        ),
+        'token'  => array(
+          'type'      => 'varchar',
+          'length'    => 150,
+          'not null'  => TRUE
+        ),
+        'date'  => array(
+          'type'      => 'int',
+          'not null'  => TRUE
+        )
+      ),
+      'indexes' => array(
+        'user_id' => array('user_id'),
+      ),
+      'primary key' => array('id'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function BRM_recurrence_install() {
+  variable_set('BRM_recurrence_mail_informer', '');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function BRM_recurrence_uninstall() {
+  variable_del('BRM_recurrence_mail_informer');
+  drupal_uninstall_schema('brm_recurrence');
+  drupal_uninstall_schema('brm_recurrence_token');
+}

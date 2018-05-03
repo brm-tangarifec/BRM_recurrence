@@ -1,0 +1,6 @@
+<?php
+
+/**
+ *Módulo para la recurrencia
+ * Implement hook_menu()
+ */

@@ -1,0 +1,5 @@
+name = BRM Recurrence
+description = Module for manage recurrence from site into ubercart
+dependencies[] = uc_order
+package = Modulos Customs BRM
+core = 7.x
