@@ -8,7 +8,7 @@
 function BRM_recurrence_menu() {
   return array(
   	'cart/recurrence' => array(
-  	'page callback' => 'kitsTpl',
+  	'page callback' => 'recurrenceTpl',
   	'access arguments' => TRUE,
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
@@ -32,6 +32,6 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
-	$variables['carrito']= uc_cart_get_contents();
+	$variables['carrito']= getLastOrderUser($user->uid);
 	return theme('recurrence',$variables);
 }
