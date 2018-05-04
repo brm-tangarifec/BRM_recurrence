@@ -4,3 +4,34 @@
  *Módulo para la recurrencia
  * Implement hook_menu()
  */
+
+function BRM_recurrence_menu() {
+  return array(
+  	'cart/recurrence' => array(
+  	'page callback' => 'kitsTpl',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
+
+
+    ),
+  );
+}
+
+
+//Función para cargar los temas
+
+function BRM_recurrence_theme($existing, $type, $theme, $path){
+    return array(
+      'recurrence' => array(
+        'template' => 'theme/recurrence'
+      ),
+  );
+}
+
+
+/*Obtener el tpl para activar la recurrencia*/
+function recurrenceTpl(){
+	$variables['carrito']= uc_cart_get_contents();
+	return theme('recurrence',$variables);
+}
