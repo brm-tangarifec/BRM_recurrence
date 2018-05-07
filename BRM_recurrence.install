@@ -42,6 +42,12 @@ function BRM_recurrence_schema() {
         'not null' => TRUE,
         'default' => 'y',
       ),
+      'created' => array(
+        'description' => 'A Unix timestamp indicating when this site link was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      ),
     ),
     'indexes' => array(
       'order_id' => array('order_id'),
