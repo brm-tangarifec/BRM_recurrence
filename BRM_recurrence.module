@@ -18,6 +18,21 @@ function BRM_recurrence_menu() {
   );
 }
 
+//Función para alterar el comportamiento de una url
+
+function BRM_recurrence_url_inbound_alter(&$path, $original_path, $path_language) {
+
+  // Se agrega js al carrito
+  if (preg_match('|^cart(/.*)?|', $path, $matches)) {
+  		drupal_add_js(drupal_get_path('module', 'BRM_recurrence') . '/js/recurrence.js', array( 'scope' => 'footer', 'weight' => 7 , 'group' => JS_LIBRARY, 'preprocess' => FALSE, 'cache' => FALSE));
+  }
+
+  if ($path=='cart/checkout') {
+  	if(isset($_COOKIE['carritoR']) && !empty($_COOKIE['carritoR'])){
+  		drupal_goto('cart/recurrence');
+  	}
+  }
+}
 
 //Función para cargar los temas
 
@@ -32,6 +47,6 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
-	$variables['carrito']= getLastOrderUser($user->uid);
+	$variables['carrito']= uc_cart_get_contents();
 	return theme('recurrence',$variables);
 }

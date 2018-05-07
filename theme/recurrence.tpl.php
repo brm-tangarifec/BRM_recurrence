@@ -1,3 +1,3 @@
 <?php
-printVar($variables);
+printVar($variables['carrito']);
 ?>
