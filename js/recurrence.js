@@ -1,14 +1,17 @@
 jQuery(document).ready(function($){
 	console.log('Carrito');
 	var cookieR=[];
-	jQuery('.frecuencia').each(function(i,val){
-		console.log(i);
-		console.log(jQuery(this).attr('data-kitId'));
-		var objR= [{"kitId":jQuery(this).attr('data-kitId'),"frecuencia":jQuery(this).val()}];
-		cookieR.push(objR);
+	jQuery('.btn-comprar').click(function(r){
+		console.log('Le dieron click');
+		jQuery('.frecuencia').each(function(i,val){
+			console.log(i);
+			console.log(jQuery(this).attr('data-kitId'));
+			var objR= {"kitId":jQuery(this).attr('data-kitId'),"frecuencia":jQuery(this).val()};
+			cookieR.push(objR);
+		});
+		cookieR = JSON.stringify(cookieR);
+		setCookie('carritoR',cookieR,3200);
 	});
-	cookieR = JSON.stringify(cookieR);
-	setCookie('carritoR',cookieR,15);
 });
 
 

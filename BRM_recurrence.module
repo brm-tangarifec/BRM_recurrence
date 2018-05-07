@@ -47,6 +47,7 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
+	printVar(base64_decode($_COOKIE['carritoR']));
 	$variables['carrito']= uc_cart_get_contents();
 	return theme('recurrence',$variables);
 }
