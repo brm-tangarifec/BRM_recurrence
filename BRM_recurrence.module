@@ -48,6 +48,26 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
 	printVar(base64_decode($_COOKIE['carritoR']));
+	$carritoR=json_decode(base64_decode($_COOKIE['carritoR']));
+	printVar($carritoR);
+	foreach ($carritoR as $key => $value) {
+		printVar($value);
+		$productK=orderByIdKit($value->kitId);
+		printVar($productK);
+	}
 	$variables['carrito']= uc_cart_get_contents();
 	return theme('recurrence',$variables);
+}
+
+
+function orderByIdKit($idKit){
+	$dataK=array();
+	$query=db_select('uc_product_kits','upk');
+	$result=$query->fields('upk',array('product_id'))
+	->condition('upk.nid',$idKit,'=')
+	->execute();
+	while($record=$result->fetchAssoc()){
+		$dataK[]=$record['product_id'];
+	}
+	return $dataK;
 }
