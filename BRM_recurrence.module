@@ -48,27 +48,55 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
 	global $user;
-	printVar($user->uid);
-	printVar(base64_decode($_COOKIE['carritoR']));
+	//printVar($user->uid);
+	//printVar(base64_decode($_COOKIE['carritoR']));
 	$carritoR=json_decode(base64_decode($_COOKIE['carritoR']));
 	printVar($carritoR);
-	
+	$orderActive=getLastOrderUser($user->uid);
       // Create a new order if necessary.
-      //$order = uc_order_new($user->uid,'in_checkout');
-      //$order_id = $order->order_id;
-	foreach ($carritoR as $key => $value) {
-		printVar($value);
-		$productK=orderByIdKit($value->kitId);
-		printVar($productK);
-		for ($i=0; $i < count($productK); $i++) {
-			$productNode = node_load($productK[$i]);
-			printVar($productNode);
-			$product = uc_product_load($productNode);
-			printVar($product,'Producto');
-		}
-		
+	//printVar($orderActive);
+	
+	if(!$orderActive){
+		$order = uc_order_new($user->uid,'in_checkout');
+		$order_id = $order->order_id;	
+	}else{
+		$order_id = $orderActive['order_id'];
 	}
-	$variables['carrito']= uc_cart_get_contents();
+      //Se carga el iva
+      $taxC = uc_taxes_rate_load('4');
+      //Se llama la orden completa
+      $order = uc_order_load($order_id);
+      //Se agregan datos a la orden
+      if(!uc_order_product_revive($order->products)){
+      	$order->products = uc_cart_get_contents();
+      }
+      $order->payment_method = 'payulatam';
+
+      //Se arma la data para agregar descuentos o cupones
+      $cuponActive='';
+      $dataUns['coupons']='';
+      $dataUns=serialize($dataUns);
+      $order->data=$dataUns;
+      //Se guarda la orden
+      //printVar(uc_order_product_revive($order->products),'Productos');
+      uc_order_save($order);
+      printVar($order);
+
+      //die();
+      //
+		/*foreach ($carritoR as $key => $value) {
+			printVar($value);
+			$productK=orderByIdKit($value->kitId);
+			printVar($productK);
+			for ($i=0; $i < count($productK); $i++) {
+				$productNode = node_load($productK[$i]);
+				printVar($productNode);
+				//$product = uc_product_load($productNode);
+				printVar($product,'Producto');
+			}
+			
+		}*/
+	$variables['carrito']= $order;
 	return theme('recurrence',$variables);
 }
 
@@ -101,7 +129,7 @@ $return = $upd= db_insert('brm_recurrence')
 //Función para crear ordenes automaticas
 function custorOrder($orderId){
 
-}  
+}
 /*
 **Creación de ordenes
 $order = uc_order_new($user->uid, 'pending');
