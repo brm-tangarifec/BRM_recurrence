@@ -80,7 +80,7 @@ function recurrenceTpl(){
       //Se guarda la orden
       //printVar(uc_order_product_revive($order->products),'Productos');
       uc_order_save($order);
-      printVar($order);
+      //printVar($order);
 
       //die();
       //
