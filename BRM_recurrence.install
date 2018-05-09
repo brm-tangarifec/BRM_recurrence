@@ -23,6 +23,10 @@ function BRM_recurrence_schema() {
         'type' => 'int',
         'not null' => TRUE
       ),
+      'kit_id' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
       'product_id' => array(
         'type' => 'int',
         'not null' => TRUE
