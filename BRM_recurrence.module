@@ -12,8 +12,12 @@ function BRM_recurrence_menu() {
   	'access arguments' => TRUE,
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
-
-
+    ),
+    'test/recurrence' => array(
+  	'page callback' => 'recurrenceTest',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
     ),
   );
 }
@@ -40,6 +44,9 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
     return array(
       'recurrence' => array(
         'template' => 'theme/recurrence'
+      ),
+      'tesnting' => array(
+        'template' => 'theme/testrecurrence'
       ),
   );
 }
@@ -100,7 +107,16 @@ function recurrenceTpl(){
 	return theme('recurrence',$variables);
 }
 
+/*Obtener el tpl para activar la recurrencia*/
+function recurrenceTest(){
+	global $user;
+	
+	$variables['carrito']= $order;
+	return theme('recurrence',$variables);
+}
 
+
+//Función para obtener los productos por kit
 function orderByIdKit($idKit){
 	$dataK=array();
 	$query=db_select('uc_product_kits','upk');
@@ -112,19 +128,36 @@ function orderByIdKit($idKit){
 	}
 	return $dataK;
 }
+//Función para obtener los prodcutos y los kits
+function getProducstByOrder($order_id){
+	$dataK=array();
+	$query=db_select('uc_order_products','uop');
+	$result=$query->fields('uop',array('nid','data'))
+	->condition('uop.order_id',$order_id,'=')
+	->execute();
+	while($record=$result->fetchAssoc()){
+		$dataK[]=$record['product_id'];
+	}
+	return $dataK;
+}
+//Función para guardar las ordenes para almacenar las ordenes recurrentes
+function saveDataRecurrence($order_id,$idKit,$idToken,$drecurrence,$idProduc=array()){
 
+	printVar($idProduc);
 
-function saveDataRecurrence($idKit,$kit,$recurrence){
-$return = $upd= db_insert('brm_recurrence')
+/*$return = $upd= db_insert('brm_recurrence')
 ->fields(array(
-	'order_id' =>1 ,
-	'product_id' => 1,
-	'id_brm_recurrence_token' => 1,
-	'recurrence_days' =>1,
+	'order_id' =>$order_id,
+	'kit_id' => $idKit,
+	'id_brm_recurrence_token' => $idToken,
+	'recurrence_days' =>$drecurrence,
 	'active' =>'y',
 	'created' => REQUEST_TIME,
-))->execute();
+))->execute();*/
+
 }
+
+function getProducsByOrder()
 
 //Función para crear ordenes automaticas
 function custorOrder($orderId){
