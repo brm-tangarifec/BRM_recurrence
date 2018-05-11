@@ -153,7 +153,7 @@ function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence){
 		'order_id' => $order_id,
 		'kit_id' => $kitId,
 		'product_id' => $productId,
-		'id_brm_recurrence_token' => 1,
+		'id_brm_recurrence_token' => 1000000,
 		'recurrence_days' =>$drecurrence,
 		'active' =>'n',
 		'created' => REQUEST_TIME,
