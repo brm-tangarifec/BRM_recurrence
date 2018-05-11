@@ -58,7 +58,7 @@ function recurrenceTpl(){
 	//printVar($user->uid);
 	//printVar(base64_decode($_COOKIE['carritoR']));
 	$carritoR=json_decode(base64_decode($_COOKIE['carritoR']));
-	printVar($carritoR);
+	//printVar($carritoR);
 	$orderActive=getLastOrderUser($user->uid);
       // Create a new order if necessary.
 	//printVar($orderActive);
@@ -76,6 +76,7 @@ function recurrenceTpl(){
       //Se agregan datos a la orden
       if(!getProducsByOrder($order_id)){
       	$order->products = uc_cart_get_contents();
+      	saveDataRecurrence($order_id,$carritoR);
       }
       $order->payment_method = 'payulatam';
 
@@ -87,23 +88,8 @@ function recurrenceTpl(){
       //Se guarda la orden
       //printVar(uc_order_product_revive($order->products),'Productos');
       uc_order_save($order);
-      saveDataRecurrence($order_id,$carritoR);
+      
       //printVar($order);
-
-      //die();
-      //
-		/*foreach ($carritoR as $key => $value) {
-			printVar($value);
-			$productK=orderByIdKit($value->kitId);
-			printVar($productK);
-			for ($i=0; $i < count($productK); $i++) {
-				$productNode = node_load($productK[$i]);
-				printVar($productNode);
-				//$product = uc_product_load($productNode);
-				printVar($product,'Producto');
-			}
-			
-		}*/
 	$variables['carrito']= $order;
 	return theme('recurrence',$variables);
 }
@@ -146,26 +132,41 @@ function getProducstByOrder($order_id){
 //Función para guardar las ordenes para almacenar las ordenes recurrentes
 function saveDataRecurrence($order_id,$data=array()){
 
-	printVar($order_id,'Orden');
-	printVar($data,'datos');
+	//printVar($order_id,'Orden');
 
-/*$return = $upd= db_insert('brm_recurrence')
-->fields(array(
-	'order_id' =>$order_id,
-	'kit_id' => $idKit,
-	'id_brm_recurrence_token' => $idToken,
-	'recurrence_days' =>$drecurrence,
-	'active' =>'y',
-	'created' => REQUEST_TIME,
-))->execute();*/
+	foreach ($data as $key => $value) {
+		//printVar($value,'datos');
+		for ($i=0; $i < count($value->productId) ; $i++) { 
+			//printVar($value->productId[$i],'Product ID');
+			saveRecurrenceByProduct($order_id,$value->kitId,$value->productId[$i],$value->frecuencia);
+		}
+	}
+
+/*;*/
 
 }
+
+//Función para guardar los datos por producto
+function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence){
+	$return = db_insert('brm_recurrence')
+	->fields(array(
+		'order_id' => $order_id,
+		'kit_id' => $kitId,
+		'product_id' => $productId,
+		'id_brm_recurrence_token' => 1,
+		'recurrence_days' =>$drecurrence,
+		'active' =>'n',
+		'created' => REQUEST_TIME,
+	))->execute();
+	return $return;
+}
+
 
 //Función para comprobar si existen productos para la orden
 function getProducsByOrder($order_id){
 	$query=db_select('uc_order_products','upc');
 	$result=$query->fields('upc',array('order_id'))
-	->condition('upc.order_id',1296,'=')
+	->condition('upc.order_id',$order_id,'=')
 	->execute();
 	$return=$result->fetchAssoc();
 
@@ -180,6 +181,19 @@ function getProducsByOrder($order_id){
 function custorOrder($orderId){
 
 }
+
+//función para actualizar el token y estado de la orden recurrente
+function updateRecurrenceByOrden($order_id,$tokenId){
+	db_update('brm_recurrence')->fields(array(
+    "id_brm_recurrence_token"=>$tokenId,
+    "active"=>'y',
+    "created"=> REQUEST_TIME,
+    ))
+   ->condition('order_id', $order_id)
+   ->execute();
+}
+
+//Función para actualizar las ordenes
 /*
 **Creación de ordenes
 $order = uc_order_new($user->uid, 'pending');
