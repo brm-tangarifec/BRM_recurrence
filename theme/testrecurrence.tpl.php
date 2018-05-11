@@ -1,4 +1,4 @@
 <?php
-//printVar($variables['carrito']);
+printVar($variables['carrito']);
 echo 'Hola test';
 ?>

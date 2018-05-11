@@ -72,9 +72,9 @@ function recurrenceTpl(){
       //Se carga el iva
       $taxC = uc_taxes_rate_load('4');
       //Se llama la orden completa
-      $order = uc_order_load($order_id);
+      $order = uc_order_load($order_id,'ProductOrden');
       //Se agregan datos a la orden
-      if(!uc_order_product_revive($order->products)){
+      if(!getProducsByOrder($order_id)){
       	$order->products = uc_cart_get_contents();
       }
       $order->payment_method = 'payulatam';
@@ -87,6 +87,7 @@ function recurrenceTpl(){
       //Se guarda la orden
       //printVar(uc_order_product_revive($order->products),'Productos');
       uc_order_save($order);
+      saveDataRecurrence($order_id,$carritoR);
       //printVar($order);
 
       //die();
@@ -110,9 +111,11 @@ function recurrenceTpl(){
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTest(){
 	global $user;
+	$order_id='1295';
+	$order=uc_order_load($order_id);
 	
 	$variables['carrito']= $order;
-	return theme('recurrence',$variables);
+	return theme('tesnting',$variables);
 }
 
 
@@ -141,9 +144,10 @@ function getProducstByOrder($order_id){
 	return $dataK;
 }
 //Función para guardar las ordenes para almacenar las ordenes recurrentes
-function saveDataRecurrence($order_id,$idKit,$idToken,$drecurrence,$idProduc=array()){
+function saveDataRecurrence($order_id,$data=array()){
 
-	printVar($idProduc);
+	printVar($order_id,'Orden');
+	printVar($data,'datos');
 
 /*$return = $upd= db_insert('brm_recurrence')
 ->fields(array(
@@ -157,7 +161,20 @@ function saveDataRecurrence($order_id,$idKit,$idToken,$drecurrence,$idProduc=arr
 
 }
 
-function getProducsByOrder()
+//Función para comprobar si existen productos para la orden
+function getProducsByOrder($order_id){
+	$query=db_select('uc_order_products','upc');
+	$result=$query->fields('upc',array('order_id'))
+	->condition('upc.order_id',1296,'=')
+	->execute();
+	$return=$result->fetchAssoc();
+
+	if(!empty($return)){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+}
 
 //Función para crear ordenes automaticas
 function custorOrder($orderId){
