@@ -47,11 +47,13 @@ function BRM_recurrence_schema() {
         'default' => 'y',
       ),
       'created' => array(
-        'description' => 'A Unix timestamp indicating when this site link was created.',
-        'type' => 'int',
+        'type' => 'datetime',
         'not null' => TRUE,
-        'default' => 0
       ),
+      'modified' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+      )
     ),
     'indexes' => array(
       'order_id' => array('order_id'),
@@ -82,7 +84,7 @@ function BRM_recurrence_schema() {
           'not null'  => TRUE
         ),
         'date'  => array(
-          'type'      => 'int',
+          'type'      => 'datetime',
           'not null'  => TRUE
         )
       ),
@@ -91,6 +93,32 @@ function BRM_recurrence_schema() {
       ),
       'primary key' => array('id'),
     ),
+  'brm_bandera' => array(
+    'description' => t('This table save the bandera programmed process'),
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary identifier for id token recurrence.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null'  => TRUE
+      ),
+      'state' => array(
+        'description' => 'this field is for execute process if the bandera is active'
+        'type'      => 'varchar',
+        'length'    => 5,
+        'not null'  => TRUE
+      ),
+      'created' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+      ),
+      'modified' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+      ),
+
+    ),
+  ),
   );
 
   return $schema;
