@@ -47,11 +47,11 @@ function BRM_recurrence_schema() {
         'default' => 'y',
       ),
       'created' => array(
-        'type' => 'datetime',
+        'mysql_type' => 'DATETIME',
         'not null' => TRUE,
       ),
-      'modified' => array(
-        'type' => 'datetime',
+      'change' => array(
+        'mysql_type' => 'DATETIME',
         'not null' => TRUE,
       ),
     ),
@@ -84,7 +84,7 @@ function BRM_recurrence_schema() {
           'not null'  => TRUE
         ),
         'date'  => array(
-          'type' => 'datetime',
+          'mysql_type' => 'DATETIME',
           'not null'  => TRUE
         )
       ),
@@ -110,11 +110,11 @@ function BRM_recurrence_schema() {
         'not null'  => TRUE
       ),
       'created' => array(
-        'type' => 'datetime',
+        'mysql_type' => 'DATETIME',
         'not null' => TRUE
       ),
-      'modified' => array(
-        'type' => 'datetime',
+      'change' => array(
+        'mysql_type' => 'DATETIME',
         'not null' => TRUE
       ),
 

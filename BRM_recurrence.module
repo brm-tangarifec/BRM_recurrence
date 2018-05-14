@@ -19,9 +19,27 @@ function BRM_recurrence_menu() {
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
     ),
+    'admin/store/settings/brm-recurrence' => array(
+      'title'            => t('Manage recurrence settings for BRM'),
+      'description'      => t('Configure basic settings for recurrence'),
+      'page callback'    => 'drupal_get_form',
+      'page arguments'   => array('BRM_recurrence_admin_form'),
+      'access arguments' => array('create-invoice'),
+
+    ),
   );
 }
 
+
+//Función para generar los permisos de las url del menú
+function BRM_recurrence_permission() {
+  return array(
+    'admin-recurrence' => array(
+      'title'       => t("Recurrences Settings"),
+      'description' => t("Allow the user to config the recurrence")
+    )
+  );
+}
 //Función para alterar el comportamiento de una url
 
 function BRM_recurrence_url_inbound_alter(&$path, $original_path, $path_language) {
@@ -191,6 +209,40 @@ function updateRecurrenceByOrden($order_id,$tokenId){
     ))
    ->condition('order_id', $order_id)
    ->execute();
+}
+//'#type' => 'date',
+function BRM_recurrence_admin_form($form, &$form_state) {
+  $form = array(
+    'BRM_recurrence_hour_request' => array(
+      '#type'   => 'textfield',
+      '#attributes' => array(
+        ' type' => 'time', // insert space before attribute name :)
+    	),
+      '#title'  => t("Hour to request"),
+      '#description'  => t("Field to enter the time at which the payu call is executed"),
+      '#default_value'  =>  strtoupper(trim(ltrim(rtrim(variable_get('BRM_recurrence_hour_request')))))
+    ),
+    'BRM_recurrence_hour_down' => array(
+      '#type'   => 'textfield',
+      '#title'  => t("Hout to down the 'bandera'"),
+      '#attributes' => array(
+        ' type' => 'time', // insert space before attribute name :)
+    	),
+      '#description'  => t("Field to enter the time at which the flag is down"),
+      '#default_value'  =>  trim(ltrim(rtrim(variable_get('BRM_recurrence_hour_down'))))
+    ),
+    'BRM_recurrence_mail_informer' => array(
+      '#type'   => 'textfield',
+      '#title'  => t("Mail information"),
+      '#attributes' => array(
+        ' type' => 'email', // insert space before attribute name :)
+    	),
+      '#description'  => t("Mail to send the approximate billing alert"),
+      '#default_value'  =>  trim(ltrim(rtrim(variable_get('BRM_recurrence_mail_informer'))))
+    ),
+  );
+
+  return system_settings_form($form);
 }
 
 //Función para actualizar las ordenes
