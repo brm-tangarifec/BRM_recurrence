@@ -53,7 +53,7 @@ function BRM_recurrence_schema() {
       'modified' => array(
         'type' => 'datetime',
         'not null' => TRUE,
-      )
+      ),
     ),
     'indexes' => array(
       'order_id' => array('order_id'),
@@ -84,7 +84,7 @@ function BRM_recurrence_schema() {
           'not null'  => TRUE
         ),
         'date'  => array(
-          'type'      => 'datetime',
+          'type' => 'datetime',
           'not null'  => TRUE
         )
       ),
@@ -93,6 +93,7 @@ function BRM_recurrence_schema() {
       ),
       'primary key' => array('id'),
     ),
+  //Desde acá
   'brm_bandera' => array(
     'description' => t('This table save the bandera programmed process'),
     'fields' => array(
@@ -103,22 +104,27 @@ function BRM_recurrence_schema() {
         'not null'  => TRUE
       ),
       'state' => array(
-        'description' => 'this field is for execute process if the bandera is active'
+        'description' => 'this field is for execute process if the bandera is active',
         'type'      => 'varchar',
         'length'    => 5,
         'not null'  => TRUE
       ),
       'created' => array(
         'type' => 'datetime',
-        'not null' => TRUE,
+        'not null' => TRUE
       ),
       'modified' => array(
         'type' => 'datetime',
-        'not null' => TRUE,
+        'not null' => TRUE
       ),
 
     ),
+    'indexes' => array(
+      'id' => array('id'),
+    ),
+    'primary key' => array('id'),
   ),
+  //Hasta acá
   );
 
   return $schema;
@@ -129,6 +135,8 @@ function BRM_recurrence_schema() {
  */
 function BRM_recurrence_install() {
   variable_set('BRM_recurrence_mail_informer', '');
+  variable_set('BRM_recurrence_hour_request', '');
+  variable_set('BRM_recurrence_hour_down', '');
 }
 
 /**
@@ -136,6 +144,9 @@ function BRM_recurrence_install() {
  */
 function BRM_recurrence_uninstall() {
   variable_del('BRM_recurrence_mail_informer');
+  variable_del('BRM_recurrence_hour_request');
+  variable_del('BRM_recurrence_hour_down');
   drupal_uninstall_schema('brm_recurrence');
   drupal_uninstall_schema('brm_recurrence_token');
+  drupal_uninstall_schema('brm_bandera');
 }
