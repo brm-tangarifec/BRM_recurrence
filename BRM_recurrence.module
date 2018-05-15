@@ -114,11 +114,88 @@ function recurrenceTpl(){
 
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTest(){
-	global $user;
-	printVar(getOrdersByTime('14'),'Recurrencia');
+	//Función de prueba, migrar a la función que crea las ordenes
+	//Se estipulan los tiempos
+	$recurrencia=array('14','30','60','90');
+	printVar(uc_order_load('1299'),'La orden');
+	//Se recorren los productos por ordenes
+	for ($i=0; $i <count($recurrencia) ; $i++) {
+		$RecurrerORder=getOrdersByTime($recurrencia[$i]);
+		if(!empty($RecurrerORder)){
+			printVar($RecurrerORder,'Recurrente');
+			foreach ($RecurrerORder as $key => $value) {
+				$dataOrder=getProducDataByOrder($key);
+				$orderLoad=uc_order_load($key);
+				//Se obtiene la recurrencia por usuario
+				$orderActive=getLastOrderDataUser($orderLoad->uid);
+				printVar($orderActive);
+			      // Create a new order if necessary.
+				//printVar($orderActive);
+				if(!$orderActive){
+					$orderC = uc_order_new($orderLoad->uid,'in_checkout');
+					$order_id = $orderC->order_id;
+				}else{
+					$order_id = $orderActive['order_id'];
+				}
+				$orderC->order_status='in_recurrence';
+				recurrenceStatus($order_id);
+				
+			      //Se carga el iva
+			      $taxC = uc_taxes_rate_load('4');
+			      //Se llama la orden completa
+			      $orderC = uc_order_load($order_id);
+			      //printVar($orderLoad,'Los productos por orden');
+			      //Se agregan datos a la orden
+			      if(!getProducsByOrder($order_id)){
+			      	//$orderC->products = $orderLoad->products;
+			      	//$message='Orden creada para recurrencia obtenida de la orden '.$key;
+			      	//uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
+			      }
+			      $orderC->payment_method = 'payulatam';
+
+			      //Se arma la data para agregar descuentos o cupones
+			      $cuponActive='';
+			      $dataUns['coupons']='';
+			      $dataUns=serialize($dataUns);
+			      $orderC->data=$dataUns;
+			      //Se guarda la orden
+			      //printVar(uc_order_product_revive($order->products),'Productos');
+			      uc_order_save($orderC);
+			      
+			      //Se debe actualizar el estado de la orden para separlas
+			      //printVar($dataOrder);
+				//die();
+			}
+		}
+	}
+
+	
 
 	$variables['carrito']= getBanderaRecurrence();
 	return theme('tesnting',$variables);
+}
+//función para poner el estado de recurrencia
+function recurrenceStatus($order_id){
+	db_update('uc_orders')->fields(array(
+		'order_status' => 'in_recurrence'
+	))
+	->condition('order_id',$order_id)
+	->execute();
+}
+//Función para obtener la última orden
+function getLastOrderDataUser($userId){
+  //printVar($userId);
+  $data=array();
+  $re=db_select('uc_orders','ucu');
+    $result=$re->fields('ucu',array('order_id'))
+    ->condition('ucu.uid',$userId,'=')
+    ->condition('ucu.order_status','in_recurrence','=')
+    ->range(0,1)
+    ->orderBy('ucu.order_id', 'DESC')
+    ->execute()
+    ->fetchAssoc();
+  printVar($result);
+  return $result;
 }
 
 
@@ -316,7 +393,7 @@ function BRM_recurrence_cronapi($op, $job = NULL) {
   $items['bajar_bandera'] = array(
     'description' => 'Bajar la bandera cada hora para evitar la creación de ordenes',
     'callback' => 'bajarBandera',
-    'rule' => '*/15 * * * *', // Every 2 hours
+    'rule' => '*/5 * * * *', // Every 5 minutes
   );
 
 
