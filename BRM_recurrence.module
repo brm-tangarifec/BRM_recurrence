@@ -117,18 +117,18 @@ function recurrenceTest(){
 	//Función de prueba, migrar a la función que crea las ordenes
 	//Se estipulan los tiempos
 	$recurrencia=array('14','30','60','90');
-	printVar(uc_order_load('1299'),'La orden');
+	//printVar(uc_order_load('1299'),'La orden');
 	//Se recorren los productos por ordenes
 	for ($i=0; $i <count($recurrencia) ; $i++) {
 		$RecurrerORder=getOrdersByTime($recurrencia[$i]);
 		if(!empty($RecurrerORder)){
-			printVar($RecurrerORder,'Recurrente');
+			//printVar($RecurrerORder,'Recurrente');
 			foreach ($RecurrerORder as $key => $value) {
-				$dataOrder=getProducDataByOrder($key);
-				$orderLoad=uc_order_load($key);
+				//$dataOrder=getProducDataByOrder($key);
+				$orderLoad=getOrderById($key);
 				//Se obtiene la recurrencia por usuario
 				$orderActive=getLastOrderDataUser($orderLoad->uid);
-				printVar($orderActive);
+				//printVar($orderActive);
 			      // Create a new order if necessary.
 				//printVar($orderActive);
 				if(!$orderActive){
@@ -144,13 +144,40 @@ function recurrenceTest(){
 			      $taxC = uc_taxes_rate_load('4');
 			      //Se llama la orden completa
 			      $orderC = uc_order_load($order_id);
-			      //printVar($orderLoad,'Los productos por orden');
 			      //Se agregan datos a la orden
 			      if(!getProducsByOrder($order_id)){
-			      	//$orderC->products = $orderLoad->products;
-			      	//$message='Orden creada para recurrencia obtenida de la orden '.$key;
-			      	//uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
+			      	$lastProduct=getLastOrderProduct();
+			      	$newLast=(int)$lastProduct+1;
+			      	$conteo=(int)$newLast;
+			      	$productsNewOrder=array();
+			      	$productInt=array();
+			      	$productsOrders=getProducDataByOrder($key);
+			      	//printVar($productsOrders,'Los productos');
+			      	saveProductsByOrder($order_id,$productsOrders);
+			      	//BRM_ponds_kit_uc_add_to_cart();
+			      
+			      	//$orderC->products = $productsNewOrder;
+			      	$message='Orden creada para recurrencia obtenida de la orden '.$key;
+			      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
 			      }
+			      printVar(lineItemsOrder($key),$key);
+
+			      printVar($orderC,'La orden');
+			      $orderC->primary_email=$orderLoad->primary_email;
+			      $orderC->delivery_first_name=$orderLoad->delivery_first_name;
+			      $orderC->delivery_last_name=$orderLoad->delivery_last_name;
+			      $orderC->delivery_phone=$orderLoad->delivery_phone;
+			      $orderC->delivery_street1=$orderLoad->delivery_street1;
+			      $orderC->delivery_city=$orderLoad->delivery_city;
+			      $orderC->delivery_zone=$orderLoad->delivery_zone;
+			      $orderC->delivery_country=$orderLoad->delivery_country;
+			      $orderC->billing_first_name=$orderLoad->billing_first_name;
+			      $orderC->billing_last_name=$orderLoad->billing_last_name;
+			      $orderC->billing_phone=$orderLoad->billing_phone;
+			      $orderC->billing_street1=$orderLoad->billing_street1;
+			      $orderC->billing_city=$orderLoad->billing_city;
+			      $orderC->billing_zone=$orderLoad->billing_zone;
+			      $orderC->billing_country=$orderLoad->billing_country;
 			      $orderC->payment_method = 'payulatam';
 
 			      //Se arma la data para agregar descuentos o cupones
@@ -160,7 +187,7 @@ function recurrenceTest(){
 			      $orderC->data=$dataUns;
 			      //Se guarda la orden
 			      //printVar(uc_order_product_revive($order->products),'Productos');
-			      uc_order_save($orderC);
+			      //uc_order_save($orderC);
 			      
 			      //Se debe actualizar el estado de la orden para separlas
 			      //printVar($dataOrder);
@@ -182,6 +209,64 @@ function recurrenceStatus($order_id){
 	->condition('order_id',$order_id)
 	->execute();
 }
+//Función para obtener los line items
+function lineItemsOrder($order_id){
+	$datax=array();
+	$query=db_select('uc_order_line_items','ul');
+	$result=$query->fields('ul',array('type','title','amount','weight','data'))
+	->condition('order_id',$order_id,'=')
+	->condition('type','tax','!=')
+	->execute();
+	while ($record=$result->fetchAssoc()) {
+		$datax[]=$record;
+	}
+
+	return $datax;
+}
+//función para insertar los productos por orden
+function saveProductsByOrder($order_id,$campos){
+	//printVar($campos,$order_id);
+	for ($i=0; $i <count($campos) ; $i++) { 
+		printVar($campos[$i]);
+		$return = db_insert('uc_order_products')
+		->fields(array(
+			'order_id' => $order_id,
+			'nid' => $campos[$i]['nid'],
+			'title' => $campos[$i]['title'],
+			'model' => $campos[$i]['model'],
+			'qty' =>$campos[$i]['qty'],
+			'cost' =>$campos[$i]['cost'],
+			'price'=>$campos[$i]['price'],
+			'weight'=>$campos[$i]['weight'],
+			'weight_units'=>$campos[$i]['weight_units'],
+			'data'=>$campos[$i]['data'],
+		))->execute();
+//		return $return;
+	}
+}
+//Función para obtener los datos de la orden
+function getOrderById($order_id){
+	$laOrden=uc_order_load($order_id);
+
+	return $laOrden;
+}
+//Función para guardar el array con key
+function recurrence_array_push_assoc($array, $key, $value){
+	$array[$key] = $value;
+	return $array;
+}
+//función para actualizar el id de los productos por orden
+function getLastOrderProduct(){
+	$query=db_select('uc_order_products','uop');
+	$result=$query->fields('uop',array('order_product_id'))
+	->range(0, 1)
+	->orderBy('order_product_id', 'DESC')
+	->execute();
+	$record=$result->fetchAssoc();
+	//printVar($record['order_product_id']);
+	return $record['order_product_id'];
+
+}
 //Función para obtener la última orden
 function getLastOrderDataUser($userId){
   //printVar($userId);
@@ -194,7 +279,7 @@ function getLastOrderDataUser($userId){
     ->orderBy('ucu.order_id', 'DESC')
     ->execute()
     ->fetchAssoc();
-  printVar($result);
+  //printVar($result);
   return $result;
 }
 
@@ -312,10 +397,12 @@ function getProducDataByOrder($order_id){
 	$result=$query->fields('upc',array('order_id','nid','title','model','qty','cost','price','weight','weight_units','data'))
 	->condition('upc.order_id',$order_id,'=')
 	->execute();
-	$return=$result->fetchAssoc();
+	//$return=$result->fetchAssoc();
 	while($record=$result->fetchAssoc()){
-		printVar($record);
+		$datax[]=$record;
 	}
+
+	return $datax;
 }
 
 //función para actualizar el token y estado de la orden recurrente
@@ -393,7 +480,6 @@ function BRM_recurrence_cronapi($op, $job = NULL) {
   $items['bajar_bandera'] = array(
     'description' => 'Bajar la bandera cada hora para evitar la creación de ordenes',
     'callback' => 'bajarBandera',
-    'rule' => '*/5 * * * *', // Every 5 minutes
   );
 
 
