@@ -115,10 +115,9 @@ function recurrenceTpl(){
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTest(){
 	global $user;
-	$order_id='1295';
-	$order=uc_order_load($order_id);
-	
-	$variables['carrito']= $order;
+	printVar(getOrdersByTime('14'),'Recurrencia');
+
+	$variables['carrito']= getBanderaRecurrence();
 	return theme('tesnting',$variables);
 }
 
@@ -149,6 +148,7 @@ function getProducstByOrder($order_id){
 }
 //Función para guardar las ordenes para almacenar las ordenes recurrentes
 function saveDataRecurrence($order_id,$data=array()){
+	$createDate=date('Y-m-d H:m:s');
 
 	//printVar($order_id,'Orden');
 
@@ -156,7 +156,7 @@ function saveDataRecurrence($order_id,$data=array()){
 		//printVar($value,'datos');
 		for ($i=0; $i < count($value->productId) ; $i++) { 
 			//printVar($value->productId[$i],'Product ID');
-			saveRecurrenceByProduct($order_id,$value->kitId,$value->productId[$i],$value->frecuencia);
+			saveRecurrenceByProduct($order_id,$value->kitId,$value->productId[$i],$value->frecuencia,$createDate);
 		}
 	}
 
@@ -165,7 +165,7 @@ function saveDataRecurrence($order_id,$data=array()){
 }
 
 //Función para guardar los datos por producto
-function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence){
+function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence,$createDate){
 	$return = db_insert('brm_recurrence')
 	->fields(array(
 		'order_id' => $order_id,
@@ -174,7 +174,8 @@ function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence){
 		'id_brm_recurrence_token' => 1000000,
 		'recurrence_days' =>$drecurrence,
 		'active' =>'n',
-		'created' => REQUEST_TIME,
+		'created'=>$createDate,
+		'modificate'=>$createDate,
 	))->execute();
 	return $return;
 }
@@ -197,7 +198,47 @@ function getProducsByOrder($order_id){
 
 //Función para crear ordenes automaticas
 function custorOrder($orderId){
+//uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
+}
+//función para obtener los productos por fecha
+function getOrdersByTime($time){
+	//se hace el llamado a las ordenes dependiendo de la cantidad de tiempo
+	$datax=array();
+	$fechaRequest=date('Y-m-d');
+	$fechaRequestN=date('Y-m-d', strtotime($fechaRequest. ' - '.$time.' days'));
+	$start=date('Y-m-d 00:00:00', strtotime($fechaRequestN));
+	$endt=date('Y-m-d 23:59:59', strtotime($fechaRequestN));
+	$query=db_select('brm_recurrence','br');
+	$result=$query->fields('br',array('order_id','kit_id','product_id','id_brm_recurrence_token','active','recurrence_days','modificate'))
+	->condition('br.active','y','=')
+	->condition('br.modificate',array($start,$endt), 'BETWEEN')
+	->execute();
+	
+	while($record=$result->fetchAssoc()){
+		$datax[]=$record;
+	}
+	$datar=array();
+	for ($i=0; $i < count($datax) ; $i++) { 
+		$idOrden = $datax[$i]['order_id'];
+		if (count($datar[$idOrden])==0) {
+			$datar[$idOrden] = array();
+		}
+		array_push($datar[$idOrden],$datax[$i]);
+	}
+	return $datar;
+}
 
+//Función para obtener los datos del producto por orden
+function getProducDataByOrder($order_id){
+	$datax=array();
+	$query=db_select('uc_order_products','upc');
+	$result=$query->fields('upc',array('order_id','nid','title','model','qty','cost','price','weight','weight_units','data'))
+	->condition('upc.order_id',$order_id,'=')
+	->execute();
+	$return=$result->fetchAssoc();
+	while($record=$result->fetchAssoc()){
+		printVar($record);
+	}
 }
 
 //función para actualizar el token y estado de la orden recurrente
@@ -205,12 +246,12 @@ function updateRecurrenceByOrden($order_id,$tokenId){
 	db_update('brm_recurrence')->fields(array(
     "id_brm_recurrence_token"=>$tokenId,
     "active"=>'y',
-    "created"=> REQUEST_TIME,
+    "modificate"=> date('Y-m-d H:m:s'),
     ))
    ->condition('order_id', $order_id)
    ->execute();
 }
-//'#type' => 'date',
+//Función para crear el formulario de configuración,
 function BRM_recurrence_admin_form($form, &$form_state) {
   $form = array(
     'BRM_recurrence_hour_request' => array(
@@ -245,7 +286,43 @@ function BRM_recurrence_admin_form($form, &$form_state) {
   return system_settings_form($form);
 }
 
-//Función para actualizar las ordenes
+//Función para ejecutar una función si la bandera se encuentra activa
+function getBanderaRecurrence(){
+	$data=array();
+	$query=db_select('brm_bandera','bn');
+	$result=$query->fields('bn',array('state'))
+	->condition('id',1,'=')
+	->range(0,1)
+	->execute();
+	$return=$result->fetchAssoc();
+
+	return $return['state'];
+}
+//Función para bajar la bandera cada hora
+function bajarBandera(){
+	if(getBanderaRecurrence()=="S"){
+		db_update('brm_bandera')->fields(array(
+			"state"=>'N',
+			"modificate" =>date('Y-m-d H:m:s')
+		))
+		->condition('id','1','=')
+		->execute();
+	}
+}
+
+//Se define el cron
+function BRM_recurrence_cronapi($op, $job = NULL) {
+
+  $items['bajar_bandera'] = array(
+    'description' => 'Bajar la bandera cada hora para evitar la creación de ordenes',
+    'callback' => 'bajarBandera',
+    'rule' => '*/15 * * * *', // Every 2 hours
+  );
+
+
+  return $items;
+}
+
 /*
 **Creación de ordenes
 $order = uc_order_new($user->uid, 'pending');

@@ -44,15 +44,15 @@ function BRM_recurrence_schema() {
         'type' => 'varchar',
         'length' => 1,
         'not null' => TRUE,
-        'default' => 'y',
+        'default' => 'n',
       ),
       'created' => array(
         'mysql_type' => 'DATETIME',
         'not null' => TRUE,
       ),
-      'change' => array(
+      'modificate' => array(
         'mysql_type' => 'DATETIME',
-        'not null' => TRUE,
+        'not null' => FALSE,
       ),
     ),
     'indexes' => array(
@@ -113,9 +113,9 @@ function BRM_recurrence_schema() {
         'mysql_type' => 'DATETIME',
         'not null' => TRUE
       ),
-      'change' => array(
+      'modificate' => array(
         'mysql_type' => 'DATETIME',
-        'not null' => TRUE
+        'not null' => FALSE
       ),
 
     ),
