@@ -159,10 +159,18 @@ function recurrenceTest(){
 			      	//$orderC->products = $productsNewOrder;
 			      	$message='Orden creada para recurrencia obtenida de la orden '.$key;
 			      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
+			      	printVar(lineItemsOrder($key),$key);
+				      $callShipping=lineItemsOrder($key);
+				      for ($i=0; $i < count($callShipping); $i++) { 
+				      	printVar($callShipping[$i]);
+				      	uc_order_line_item_add($order_id,$callShipping[$i]['type'],$callShipping[$i]['title'],$callShipping[$i]['amount'],$callShipping[$i]['weight'], $callShipping[$i]['data']);
+				      }
 			      }
-			      printVar(lineItemsOrder($key),$key);
 
-			      printVar($orderC,'La orden');
+			      //
+
+			      //printVar($orderLoad->line_items,'La ordenOrg');
+			      //printVar($orderC->line_items,'La orden');
 			      $orderC->primary_email=$orderLoad->primary_email;
 			      $orderC->delivery_first_name=$orderLoad->delivery_first_name;
 			      $orderC->delivery_last_name=$orderLoad->delivery_last_name;
@@ -187,7 +195,7 @@ function recurrenceTest(){
 			      $orderC->data=$dataUns;
 			      //Se guarda la orden
 			      //printVar(uc_order_product_revive($order->products),'Productos');
-			      //uc_order_save($orderC);
+			      uc_order_save($orderC);
 			      
 			      //Se debe actualizar el estado de la orden para separlas
 			      //printVar($dataOrder);
@@ -359,8 +367,97 @@ function getProducsByOrder($order_id){
 }
 
 //Función para crear ordenes automaticas
-function custorOrder($orderId){
+function custonOrderCreate(){
 //uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
+	//Función de prueba, migrar a la función que crea las ordenes
+	//Se estipulan los tiempos
+	$recurrencia=array('14','30','60','90');
+	//printVar(uc_order_load('1299'),'La orden');
+	//Se recorren los productos por ordenes
+	for ($i=0; $i <count($recurrencia) ; $i++) {
+		$RecurrerORder=getOrdersByTime($recurrencia[$i]);
+		if(!empty($RecurrerORder)){
+			//printVar($RecurrerORder,'Recurrente');
+			foreach ($RecurrerORder as $key => $value) {
+				//$dataOrder=getProducDataByOrder($key);
+				$orderLoad=getOrderById($key);
+				//Se obtiene la recurrencia por usuario
+				$orderActive=getLastOrderDataUser($orderLoad->uid);
+				//printVar($orderActive);
+			      // Create a new order if necessary.
+				//printVar($orderActive);
+				if(!$orderActive){
+					$orderC = uc_order_new($orderLoad->uid,'in_checkout');
+					$order_id = $orderC->order_id;
+				}else{
+					$order_id = $orderActive['order_id'];
+				}
+				$orderC->order_status='in_recurrence';
+				recurrenceStatus($order_id);
+				
+			      //Se carga el iva
+			      $taxC = uc_taxes_rate_load('4');
+			      //Se llama la orden completa
+			      $orderC = uc_order_load($order_id);
+			      //Se agregan datos a la orden
+			      if(!getProducsByOrder($order_id)){
+			      	$lastProduct=getLastOrderProduct();
+			      	$newLast=(int)$lastProduct+1;
+			      	$conteo=(int)$newLast;
+			      	$productsNewOrder=array();
+			      	$productInt=array();
+			      	$productsOrders=getProducDataByOrder($key);
+			      	//printVar($productsOrders,'Los productos');
+			      	saveProductsByOrder($order_id,$productsOrders);
+			      	//BRM_ponds_kit_uc_add_to_cart();
+			      
+			      	//$orderC->products = $productsNewOrder;
+			      	$message='Orden creada para recurrencia obtenida de la orden '.$key;
+			      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
+			      	printVar(lineItemsOrder($key),$key);
+				      $callShipping=lineItemsOrder($key);
+				      for ($i=0; $i < count($callShipping); $i++) { 
+				      	printVar($callShipping[$i]);
+				      	uc_order_line_item_add($order_id,$callShipping[$i]['type'],$callShipping[$i]['title'],$callShipping[$i]['amount'],$callShipping[$i]['weight'], $callShipping[$i]['data']);
+				      }
+			      }
+
+			      //
+
+			      //printVar($orderLoad->line_items,'La ordenOrg');
+			      //printVar($orderC->line_items,'La orden');
+			      $orderC->primary_email=$orderLoad->primary_email;
+			      $orderC->delivery_first_name=$orderLoad->delivery_first_name;
+			      $orderC->delivery_last_name=$orderLoad->delivery_last_name;
+			      $orderC->delivery_phone=$orderLoad->delivery_phone;
+			      $orderC->delivery_street1=$orderLoad->delivery_street1;
+			      $orderC->delivery_city=$orderLoad->delivery_city;
+			      $orderC->delivery_zone=$orderLoad->delivery_zone;
+			      $orderC->delivery_country=$orderLoad->delivery_country;
+			      $orderC->billing_first_name=$orderLoad->billing_first_name;
+			      $orderC->billing_last_name=$orderLoad->billing_last_name;
+			      $orderC->billing_phone=$orderLoad->billing_phone;
+			      $orderC->billing_street1=$orderLoad->billing_street1;
+			      $orderC->billing_city=$orderLoad->billing_city;
+			      $orderC->billing_zone=$orderLoad->billing_zone;
+			      $orderC->billing_country=$orderLoad->billing_country;
+			      $orderC->payment_method = 'payulatam';
+
+			      //Se arma la data para agregar descuentos o cupones
+			      $cuponActive='';
+			      $dataUns['coupons']='';
+			      $dataUns=serialize($dataUns);
+			      $orderC->data=$dataUns;
+			      //Se guarda la orden
+			      //printVar(uc_order_product_revive($order->products),'Productos');
+			      uc_order_save($orderC);
+			      
+			      //Se debe actualizar el estado de la orden para separlas
+			      //printVar($dataOrder);
+				//die();
+			}
+		}
+	}
 }
 //función para obtener los productos por fecha
 function getOrdersByTime($time){
@@ -480,6 +577,12 @@ function BRM_recurrence_cronapi($op, $job = NULL) {
   $items['bajar_bandera'] = array(
     'description' => 'Bajar la bandera cada hora para evitar la creación de ordenes',
     'callback' => 'bajarBandera',
+    'rule' => '*/5 * * * *', // Every 5 minutes
+  );
+  $items['OrdenesPayu'] = array(
+    'description' => 'Función para ejecutar la creación de ordenes cada 24 horas',
+    'callback' => 'custonOrderCreate',
+    'rule' => '*/5 * * * *', // Every 5 minutes
   );
 
 
