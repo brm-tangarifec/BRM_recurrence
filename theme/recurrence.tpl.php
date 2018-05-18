@@ -155,7 +155,7 @@ echo 'Hola';
 
 				<div class="form-item">
 					<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
-					<input type="num" id="cosec" name="cosec" pattern="[0-9]{3}" placeholder="123">
+					<input type="num" id="cosec" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
 
 				</div>
 
