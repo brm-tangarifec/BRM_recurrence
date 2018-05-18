@@ -3,9 +3,10 @@
 	font-size: 1.4rem !important;
 }
 #recurrencia .form-fecha-tc.form-item .form-tc{
-	width: 43%;
 	float:left;
 	margin:1rem;
+	max-width: 43%;
+	width: 100%;
 }
 
 
