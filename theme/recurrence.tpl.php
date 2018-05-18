@@ -147,7 +147,7 @@
 					<label for="ven">Fecha de Vencimiento</label>
 					<div class="clearfix"></div>
 					<input class="form-tc" type="num" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
-					<input class="form-tc" type="num"  maxlength="10" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
+					<input class="form-tc" type="num"  maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
 					<div class="clearfix"></div>
 				</div>
 
