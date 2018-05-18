@@ -119,7 +119,7 @@ function recurrenceTest(){
 	$recurrencia=array('14','30','60','90');
 	//printVar(uc_order_load('1299'),'La orden');
 	//Se recorren los productos por ordenes
-	for ($i=0; $i <count($recurrencia) ; $i++) {
+	/*for ($i=0; $i <count($recurrencia) ; $i++) {
 		$RecurrerORder=getOrdersByTime($recurrencia[$i]);
 		if(!empty($RecurrerORder)){
 			//printVar($RecurrerORder,'Recurrente');
@@ -208,7 +208,7 @@ function recurrenceTest(){
 				//die();
 			}
 		}
-	}
+	}*/
 
 	$hora=variable_get('BRM_recurrence_hour_request', '');
 	$onlyHour=date('H', $hora);
