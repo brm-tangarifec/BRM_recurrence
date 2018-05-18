@@ -2,15 +2,7 @@
 .row-rec, .row-rec p{
 	font-size: 1.4rem !important;
 }
-#recurrencia .form-fecha-tc.form-item .form-tc{
-	float:left;
-	margin:1rem;
-	max-width: 43%;
-	width: 100%;
-}
-
-
-#recurrencia .form-fecha-tc.form-item input{
+#recurrencia .form-item input{
 	background: #f2f2f2 ;
 	border: 1px solid #fff;
 	padding: 10px;
@@ -21,6 +13,16 @@
 	-o-transition: all ease-in-out .3s;
 	width: 100%;
 }
+
+
+#recurrencia .form-fecha-tc.form-item .form-tc{
+	float:left;
+	margin:1rem;
+	max-width: 43%;
+	width: 100%;
+}
+
+
 
 #recurrencia .form-fecha-tc.form-item input:focus{
 	border-color:#20b7c8;
