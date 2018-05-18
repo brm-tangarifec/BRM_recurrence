@@ -74,9 +74,9 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 function recurrenceTpl(){
 	global $user;
 	//printVar($user->uid);
-	//printVar(base64_decode($_COOKIE['carritoR']));
+	printVar(base64_decode($_COOKIE['carritoR']));
 	$carritoR=json_decode(base64_decode($_COOKIE['carritoR']));
-	//printVar($carritoR);
+	printVar($carritoR);
 	$orderActive=getLastOrderUser($user->uid);
       // Create a new order if necessary.
 	//printVar($orderActive);
