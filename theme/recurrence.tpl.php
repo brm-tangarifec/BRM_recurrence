@@ -5,7 +5,7 @@ echo 'Hola';
 // drupal_add_js(base_path() . path_to_theme() . '/js/libs/jquery.validate.js', array( 'scope' => 'footer', 'weight' => 5 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
 // drupal_add_js(base_path() . path_to_theme() . '/js/brm.feedback.js', array( 'scope' => 'footer', 'weight' => 6 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
 
-	drupal_add_css(path_to_theme() . '/css/brm/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => TRUE));
+	drupal_add_css(path_to_theme() . '/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false));
 
 
 ?>
@@ -162,7 +162,7 @@ echo 'Hola';
 					</div>
 
 					<div class="clearfix"></div>
-					
+
 				</div>
 
 

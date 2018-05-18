@@ -1,0 +1,19 @@
+/*recurrencia.css*/
+#recurrencia .form-fecha-tc.form-item .form-tc{
+	width: 48%;
+	float:left;
+	margin:1rem;
+}
+
+#recurrencia .form-fecha-tc.form-item input::-webkit-input-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input::-moz-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input:-ms-input-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input:-moz-placeholder{
+	color:black;
+}
