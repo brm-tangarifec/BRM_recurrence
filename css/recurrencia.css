@@ -14,11 +14,17 @@
 	width: 100%;
 }
 
+#recurrencia .form-item label small{
+	font-size: 55%;
+}
+
+
+
 
 #recurrencia .form-fecha-tc.form-item .form-tc{
 	float:left;
-	margin:1rem;
-	max-width: 43%;
+	margin:0 0.1rem;
+	max-width: 49%;
 	width: 100%;
 }
 
