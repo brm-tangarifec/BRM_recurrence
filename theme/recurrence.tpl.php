@@ -1,11 +1,22 @@
 <?php
 //printVar($variables['carrito']);
 
+$orderRecurrence=$variables['carrito'];
 
 // drupal_add_js(base_path() . path_to_theme() . '/js/libs/jquery.validate.js', array( 'scope' => 'footer', 'weight' => 5 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
 // drupal_add_js(base_path() . path_to_theme() . '/js/brm.feedback.js', array( 'scope' => 'footer', 'weight' => 6 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
 
-
+for ($i=0; $i <count($orderRecurrence->line_items) ; $i++) { 
+	if($orderRecurrence->line_items[$i]['type']=='subtotal'){
+		$subtotal=$orderRecurrence->line_items[$i]['amount'];		
+	}
+	if($orderRecurrence->line_items[$i]['type']=='tax'){
+		$taxTitle=$orderRecurrence->line_items[$i]['title'];
+		$ivamout=$orderRecurrence->line_items[$i]['amount'];
+	}
+	//printVar($orderRecurrence->line_items[$i]);
+ }
+//printVar($orderRecurrence);
 ?>
 
 <div class="row">
@@ -18,11 +29,11 @@
 			<div class="fieldset-wrapper"><table class="cart-review sticky-enabled">
 			 <thead><tr><th class="qty"><abbr title="Quantity">Cantidad</abbr></th><th class="products">Productos</th><th class="price">Precio</th> </tr></thead>
 			<tbody>
-			 <tr class="odd"><td class="qty">1 ×</td><td class="products"><a href="/content/ponds-flawless-radiance-espuma-facial-piel-radiante-y-sin-manchas">POND'S FLAWLESS RADIANCE ESPUMA FACIAL PIEL RADIANTE Y SIN MANCHAS*.</a></td><td class="price"><span class="uc-price">$17,500</span><span class="price-suffixes"></span></td> </tr>
-			 <tr class="even"><td class="qty">1 ×</td><td class="products"><a href="/content/ponds-flawless-radiance-crema-facial-restauradora-de-noche">POND'S FLAWLESS RADIANCE CREMA FACIAL RESTAURADORA DE NOCHE</a></td><td class="price"><span class="uc-price">$43,400</span><span class="price-suffixes"></span></td> </tr>
-			 <tr class="odd"><td class="qty">1 ×</td><td class="products"><a href="/content/ponds-flawless-radiance-crema-facial-perfeccionadora-bb-cream-light">POND'S FLAWLESS RADIANCE CREMA FACIAL PERFECCIONADORA BB CREAM LIGHT</a></td><td class="price"><span class="uc-price">$30,700</span><span class="price-suffixes"></span></td> </tr>
-			 <tr class="even"><td class="qty">2 ×</td><td class="products"><a href="/content/ponds-fr-conc-desv-de-manchas"> PONDS FR CONC DESV DE MANCHAS*</a></td><td class="price"><span class="uc-price">$0</span><span class="price-suffixes"></span></td> </tr>
-			 <tr class="subtotal odd"><td colspan="3" class="subtotal"><span id="subtotal-title">Subtotal:</span> <span class="uc-price">$91,600</span></td> </tr>
+			<?php
+			foreach ($orderRecurrence->products as $key => $productos) { ?>
+				<tr class="odd"><td class="qty"><?php print($productos->qty);?> ×</td><td class="products"><a href="<?php print(drupal_get_path_alias('node/'.$productos->nid)); ?>"><?php print($productos->title);?></a></td><td class="price"><span class="uc-price"><?php print(uc_currency_format($productos->price));?></span><span class="price-suffixes"></span></td> </tr>
+			<?php }	?>
+			 <tr class="subtotal odd"><td colspan="3" class="subtotal"><span id="subtotal-title">Subtotal:</span> <span class="uc-price"><?php  print(uc_currency_format($subtotal)); ?></span></td> </tr>
 			</tbody>
 			</table></div>
 		</fieldset>
@@ -190,7 +201,7 @@
 		<!--/- Costo de envio -->
 
 		<!-- Metodo de pago -->
-		<fieldset class="form-wrapper" id="payment-pane"><legend><span class="fieldset-legend">Método de pago</span></legend><div class="fieldset-wrapper"><div id="line-items-div"><table id="uc-order-total-preview" class="modificadaj"><tbody><tr class="line-item-subtotal"><td class="title">Subtotal:</td> <td class="price"><span class="uc-price">$76,975</span></td></tr><tr class="line-item-tax"><td class="title">IVA*:</td><td class="price"><span class="uc-price">$14,625</span></td></tr><tr class="line-item-total"><td class="title">Total productos:</td><td class="price"><span class="uc-price">$91,600</span></td></tr><tr><td class="title">Envío:</td><td class="price"><span class="uc-price">$0</span></td></tr><tr><td class="title">Total:</td><td class="price"><span class="uc-price">$91,600</span></td></tr></tbody></table></div><div class="form-item form-type-radios form-item-panes-payment-payment-method form-disabled">
+		<fieldset class="form-wrapper" id="payment-pane"><legend><span class="fieldset-legend">Método de pago</span></legend><div class="fieldset-wrapper"><div id="line-items-div"><table id="uc-order-total-preview" class="modificadaj"><tbody><tr class="line-item-subtotal"><td class="title">Subtotal:</td> <td class="price"><span class="uc-price"><?php print(uc_currency_format($subtotal)); ?></span></td></tr><tr class="line-item-tax"><td class="title"><?php print($taxTitle); ?>:</td><td class="price"><span class="uc-price"><?php  print(uc_currency_format($ivamout)); ?></span></td></tr><tr class="line-item-total"><td class="title">Total productos:</td><td class="price"><span class="uc-price">$91,600</span></td></tr><tr><td class="title">Envío:</td><td class="price"><span class="uc-price">$0</span></td></tr><tr><td class="title">Total:</td><td class="price"><span class="uc-price"><?php print(uc_currency_format($orderRecurrence->order_total)); ?></span></td></tr></tbody></table></div><div class="form-item form-type-radios form-item-panes-payment-payment-method form-disabled">
 		  <label class="element-invisible" for="edit-panes-payment-payment-method">Método de pago <span class="form-required" title="Este campo es obligatorio.">*</span></label>
 		 <div id="edit-panes-payment-payment-method" class="form-radios"><div class="form-item form-type-radio form-item-panes-payment-payment-method form-disabled active">
 		 <input disabled="disabled" type="radio" id="edit-panes-payment-payment-method-payulatam" name="panes[payment][payment_method]" value="payulatam" checked="checked" class="form-radio ajax-processed">  <label class="option" for="edit-panes-payment-payment-method-payulatam"><img src="/sites/all/modules/uc_payulatam/img/logopayulatam.png" alt="PayU Latam"> </label>
