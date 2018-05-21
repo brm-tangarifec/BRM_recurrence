@@ -1,9 +1,10 @@
 jQuery(document).ready(function($){
 	//console.log('Carrito');
 	var cookieR=[];
+	var banderaRecurrencia='N'; 
 	jQuery('.btn-comprar').click(function(r){
 		//console.log('Le dieron click');
-		if(jQuery('.frecuenciaArma').length>0){
+	if(jQuery('.frecuencia').length>0){
 		jQuery('.frecuencia').each(function(i,val){
 			var nodeID=[];
 			jQuery(this).parent().parent().prev().find('li').each(function(e,node){
@@ -13,6 +14,10 @@ jQuery(document).ready(function($){
 			//console.log(nodeID);
 			var objR= {"kitId":jQuery(this).attr('data-kitId'),'productId':nodeID,"frecuencia":jQuery(this).val()};
 			cookieR.push(objR);
+
+			if(jQuery(this).val()>0 ){
+				banderaRecurrencia='S'; 
+			}
 		});
 	}
 	if(jQuery('.frecuenciaArma').length>0){
@@ -25,11 +30,16 @@ jQuery(document).ready(function($){
 		//var objRAk= {"kitId":jQuery(this).attr('data-kitId'),'productId':nodeID,"frecuencia":jQuery(this).val()};
 		//console.log(objRAk);
 		cookieR.push(objRAk);
+		if(jQuery(this).val()>0){
+			banderaRecurrencia='S'; 
+		}
 		});
 	}
 
-		cookieR = JSON.stringify(cookieR);
-		setCookie('carritoR',cookieR,3200);
+		if(banderaRecurrencia=='S'){
+			cookieR = JSON.stringify(cookieR);
+			setCookie('carritoR',cookieR,3200);
+		}
 	});
 
 	//función para obtener la frecuencia por producto
