@@ -64,7 +64,28 @@ jQuery(document).ready(function($){
 	  }
 	}
 
+	//Comprobar franquicia
 
+jQuery('#numtc').blur(function(r){
+	var numtc=jQuery('#numtc').val();
+	if(numtc.length>10){
+		jQuery.ajax({
+		type: "POST",
+		url: "/cart/checkccf",
+		data:{
+		  consul:numtc,
+		  vartC: 'verify' 
+		},
+
+			success: function(data){
+			  console.log(data);      
+			  
+			}
+		});
+	}
+});
+
+//No pasar de acá
 });
 
 

@@ -1,7 +1,7 @@
 <?php
-//printVar($variables['carrito']);
 
 $orderRecurrence=$variables['carrito'];
+$userR=user_load($orderRecurrence->uid);
 
 // drupal_add_js(base_path() . path_to_theme() . '/js/libs/jquery.validate.js', array( 'scope' => 'footer', 'weight' => 5 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
 // drupal_add_js(base_path() . path_to_theme() . '/js/brm.feedback.js', array( 'scope' => 'footer', 'weight' => 6 , 'group' => JS_LIBRARY, 'preprocess' => FALSE));
@@ -48,7 +48,7 @@ for ($i=0; $i <count($orderRecurrence->line_items) ; $i++) {
 
 			</p>
 			<p class="text-center">
-				<strong>Dirección de correo electrónico:</strong> cristian.tangarife@brm.com.co (<a href="#">Editar</a>)
+				<strong>Dirección de correo electrónico:</strong> <?php print($userR->mail);?> (<a href="/user/<?php print($orderRecurrence->uid)?>/edit">Editar</a>)
 			</p>
 
 		</div>
@@ -157,7 +157,7 @@ for ($i=0; $i <count($orderRecurrence->line_items) ; $i++) {
 				<div class="form-item form-fecha-tc">
 					<label for="ven">Fecha de Vencimiento</label>
 					<div class="clearfix"></div>
-					<input class="form-tc" type="num" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
+					<input class="form-tc" type="datetime" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
 					<input class="form-tc" type="num"  maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
 					<div class="clearfix"></div>
 				</div>
