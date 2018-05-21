@@ -82,9 +82,9 @@ function recurrenceTpl(){
 	drupal_add_css(drupal_get_path('module', 'BRM_recurrence') .'/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false));
 	global $user;
 	//printVar($user->uid);
-	printVar(base64_decode($_COOKIE['carritoR']));
+	//printVar(base64_decode($_COOKIE['carritoR']));
 	$carritoR=json_decode(base64_decode($_COOKIE['carritoR']));
-	printVar($carritoR);
+	//printVar($carritoR);
 	$orderActive=getLastOrderUser($user->uid);
       // Create a new order if necessary.
 	//printVar($orderActive);
@@ -98,7 +98,7 @@ function recurrenceTpl(){
       //Se carga el iva
       $taxC = uc_taxes_rate_load('4');
       //Se llama la orden completa
-      $order = uc_order_load($order_id,'ProductOrden');
+      $order = uc_order_load($order_id);
       //Se agregan datos a la orden
       if(!getProducsByOrder($order_id)){
       	$order->products = uc_cart_get_contents();
@@ -114,9 +114,17 @@ function recurrenceTpl(){
       //Se guarda la orden
       //printVar(uc_order_product_revive($order->products),'Productos');
       uc_order_save($order);
-      
+      $idKits=array();
+      foreach ($carritoR as $key => $valueKit) {
+      	//printVar($valueKit->kitId);
+      	if (!in_array($valueKit->kitId, $idKits)) {
+      		array_push($idKits,$valueKit->kitId);
+      	}
+      }
+      //printVar($idKits);
+    $variables['idKits']=$idKits;
       //printVar($order);
-	$variables['carrito']= $order;
+	$variables['carrito']= uc_order_load($order_id);
 	return theme('recurrence',$variables);
 }
 
@@ -256,7 +264,7 @@ function lineItemsOrder($order_id){
 	$datax=array();
 	$query=db_select('uc_order_line_items','ul');
 	$result=$query->fields('ul',array('type','title','amount','weight','data'))
-	->condition('order_id',$order_id,'=')
+	->condition('ul.order_id',$order_id,'=')
 	//->condition('type','tax','!=')
 	->execute();
 	while ($record=$result->fetchAssoc()) {
@@ -264,6 +272,30 @@ function lineItemsOrder($order_id){
 	}
 
 	return $datax;
+}
+
+//función para actualizar el envío en las ordenes
+function updateLineShipping($orde_id,$amount){
+	$datax=array();
+	$query=db_select('uc_order_line_items','ul');
+	$result=$query->fields('ul',array('line_item_id'))
+	->condition('ul.order_id',$orde_id,'=')
+	->condition('ul.type','shipping','=')
+	//->condition('type','tax','!=')
+	->execute();
+	$record=$result->fetchAssoc();
+
+	if(empty($record)){
+		uc_order_line_item_add($orde_id,'shipping','Envío',$amount,1,'');
+	}else{
+		db_update('uc_order_line_items')->fields(array(
+			'amount' => $amount
+		))
+		->condition('order_id',$orde_id)
+		->condition('type','shipping')
+		->execute();
+	}
+	//die();
 }
 //función para insertar los productos por orden
 function saveProductsByOrder($order_id,$campos){
@@ -734,4 +766,39 @@ function check_cc($cc, $extra_check = false){
         $result = (validatecard($cc))?1:0;
     }
     return ($result>0)?$names[sizeof($matches)-2]:false;
+}
+
+//Función para calcular el envío en las recurrencias
+function shippingRecurrence($idkitR=array(),$value){
+	//ids para excluir el valor del envío
+	$idKits=getIdKits();
+	//Valor minimo para no cobrar envío
+	$banderaKit='N'; #Se busca si hay un kit para exentuar el envío
+	for ($i=0; $i < count($idkitR) ; $i++) {
+		if(in_array($idkitR[$i],$idKits)){
+		 $banderaKit='N';
+		 break;	
+		}
+	}
+
+	if($banderaKit=='N' && $value<=70000){
+		$envio=8000;
+	}else{
+		$envio=0;
+	}
+	return $envio;
+}
+//función para obtener los id de los kits
+function getIdKits(){
+	$datan=array();
+	$query=db_select('node','n');
+	$result=$query->fields('n',array('nid'))
+	->condition('n.type','product_kit','=')
+	->condition('n.status',1,'=')
+	->execute();
+	while($record=$result->fetchAssoc()){
+		$datan[]=$record['nid'];
+	}
+
+	return $datan;
 }

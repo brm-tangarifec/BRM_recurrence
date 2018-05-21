@@ -1,5 +1,5 @@
 jQuery(document).ready(function($){
-	console.log('Carrito');
+	//console.log('Carrito');
 	var cookieR=[];
 	jQuery('.btn-comprar').click(function(r){
 		//console.log('Le dieron click');
@@ -23,7 +23,7 @@ jQuery(document).ready(function($){
 			//nodeID.push(jQuery(this).find('figure').attr('data-nId'));
 		//});
 		//var objRAk= {"kitId":jQuery(this).attr('data-kitId'),'productId':nodeID,"frecuencia":jQuery(this).val()};
-		console.log(objRAk);
+		//console.log(objRAk);
 		cookieR.push(objRAk);
 		});
 	}
@@ -40,10 +40,10 @@ jQuery(document).ready(function($){
 	  if (cookieAr!=undefined) {
 	    var find = false;
 	    jQuery.each(cookieAr,function(e,value){
-	    	console.log(value);
+	    	//console.log(value);
 	    	//jQuery.each(value, function(key, value2){
 	    		var nidPak='pid-'+value.productId;
-	    		console.log(nidPak);
+	    		//console.log(nidPak);
 	    		jQuery('#'+nidPak).change().val(value.frecuencia);
 	    	//});
 	    });
@@ -85,6 +85,14 @@ jQuery('#numtc').blur(function(r){
 	}
 });
 
+/*if(window.location.href.indexOf('recurrence') > -1){
+	setTimeout(function(){
+		console.log('Se recarga'); 
+		jQuery("#subtotalPrice").load(location.href+ ' #subtotalPrice',"");
+		jQuery("#subtotalPrice2").load(location.href+ ' #subtotalPrice2',"");
+	}, 500);
+	
+}*/
 //No pasar de acá
 });
 
