@@ -245,7 +245,9 @@ function recurrenceTest(){
 
 	$hora=variable_get('BRM_recurrence_hour_request', '');
 	$onlyHour=date('H', $hora);
+	$upBand=date($hora, strtotime("-5 minutes"));
 	printVar($hora,$onlyHour);
+	printVar($upBand,$hora);
 
 	$huorD=variable_get('BRM_recurrence_hour_down', '');
 	$downHor=explode(':',$huorD);
@@ -255,8 +257,7 @@ function recurrenceTest(){
 
 	printVar(date('Y-m-d H:i:s'));
 
-	
-
+	die();
 	$variables['carrito']= getBanderaRecurrence();
 	return theme('tesnting',$variables);
 }
@@ -456,6 +457,7 @@ function getProducsByOrder($order_id){
 function custonOrderCreate(){
 	//Función de prueba, migrar a la función que crea las ordenes
 	//Se comprueba que la bandera se encuentre arriba, para ejecutar
+	subirBandera();
 	if(getBanderaRecurrence()=="S"){
 		//Se estipulan los tiempos
 		$recurrencia=array('14','30','60','90','120');
@@ -693,6 +695,19 @@ function bajarBandera(){
 		->execute();
 	}
 }
+//función para subir la bandera
+function subirBandera(){
+	if(getBanderaRecurrence()=="N"){
+		db_update('brm_bandera')->fields(array(
+			"state"=>'S',
+			"modificate" =>date('Y-m-d H:i:s')
+		))
+		->condition('id','1','=')
+		->execute();
+	}
+}
+
+
 
 /*/Se define el cron
 function BRM_recurrence_cronapi() {
@@ -857,7 +872,9 @@ function recurrenceTesting(){
 	->orderBy('brmR.id', 'ASC')
 	->execute();
 	$datap=0;
-  $out = '<form action="/admin/store/settings/brm-recurrence/testeo/dates" method="POST" name="formListedRecurrence" id="formListedRecurrence" style="overflow-x: scroll;">
+  $out = '
+  <label>Estado bandera:</label><span>'.$bandera["state"].'</span>
+  <form action="/admin/store/settings/brm-recurrence/testeo/dates" method="POST" name="formListedRecurrence" id="formListedRecurrence" style="overflow-x: scroll;">
   <button type="submit">Probar</button><br>
   <label><input type="checkbox" value="14" id="test14" name="test14">Probar 14 días</label><br>
   <label><input type="checkbox" value="30" id="test30" name="test30">Probar 1 mes</label><br>
@@ -943,6 +960,7 @@ function testeDates(){
 				$fechaAnterior=date('Y-m-d H:i:s', strtotime($rescord['modificate']."-".$consul[$i]." days"));
 				//printVar($fechaAnterior,'Nueva fecha');
 				db_update('brm_recurrence')->fields(array(
+					'active' => 'y',
 					'modificate' => $fechaAnterior
 				))
 				->condition('id',$rescord['id'])
