@@ -23,7 +23,7 @@ if($subtotal==0){
 //die();
 
  //función para calcular el costo del envío
- printVar($orderRecurrence->order_id,'Se consulta');
+ //printVar($orderRecurrence->order_id,'Se consulta');
 $envio=shippingRecurrence($variables['idKits'],$subtotal);
 //Se agrega el Valor del envío a la orden
 updateLineShipping($orderRecurrence->order_id,$envio);

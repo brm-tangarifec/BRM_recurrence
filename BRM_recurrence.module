@@ -27,7 +27,24 @@ function BRM_recurrence_menu() {
       'access arguments' => array('admin-recurrence'),
 
     ),
-    //función para 
+    //Interna para probar las recurrencias
+    'admin/store/settings/brm-recurrence/testeo' => array(
+      'title'            => t('Test recurrence for BRM'),
+      'description'      => t('Configure the testing basic settings for recurrence'),
+      'page callback'    => 'recurrenceTesting',
+      'access callback' => TRUE,
+      'access arguments' => array('admin-recurrence'),
+
+    ),
+    'admin/store/settings/brm-recurrence/testeo/dates' => array(
+      'title'            => t('Test recurrence for BRM'),
+      'description'      => t('Configure the testing basic settings for recurrence'),
+      'page callback'    => 'testeDates',
+      'access callback' => TRUE,
+      'access arguments' => array('admin-recurrence'),
+
+    ),
+    //función para verificar franquicias de tc
     'cart/checkccf' => array(
   	'page callback' => 'verifyCC',
   	'access arguments' => TRUE,
@@ -402,18 +419,21 @@ function saveDataRecurrence($order_id,$data=array()){
 
 //Función para guardar los datos por producto
 function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence,$createDate){
-	$return = db_insert('brm_recurrence')
-	->fields(array(
-		'order_id' => $order_id,
-		'kit_id' => $kitId,
-		'product_id' => $productId,
-		'id_brm_recurrence_token' => 1000000,
-		'recurrence_days' =>$drecurrence,
-		'active' =>'n',
-		'created'=>$createDate,
-		'modificate'=>$createDate,
-	))->execute();
-	return $return;
+	if($drecurrence!=0){
+		$return = db_insert('brm_recurrence')
+		->fields(array(
+			'order_id' => $order_id,
+			'kit_id' => $kitId,
+			'product_id' => $productId,
+			'id_brm_recurrence_token' => 1000000,
+			'recurrence_days' =>$drecurrence,
+			'active' =>'n',
+			'created'=>$createDate,
+			'modificate'=>$createDate,
+		))->execute();
+		return $return;
+
+	}
 }
 
 
@@ -438,7 +458,7 @@ function custonOrderCreate(){
 	//Se comprueba que la bandera se encuentre arriba, para ejecutar
 	if(getBanderaRecurrence()=="S"){
 		//Se estipulan los tiempos
-		$recurrencia=array('14','30','60','90');
+		$recurrencia=array('14','30','60','90','120');
 		//printVar(uc_order_load('1299'),'La orden');
 		//Se recorren los productos por ordenes
 		for ($i=0; $i <count($recurrencia) ; $i++) {
@@ -536,6 +556,30 @@ function custonOrderCreate(){
 		}
 		//Se baja la bandera al crear las ordenes
 		bajarBandera();
+
+		//Se envía un email al correo registrado
+		$to = variable_get('BRM_recurrence_mail_informer','');
+		$subject = "Aproximación al tope de facturación Club Ponds";
+		$message = "
+		<html>
+		<head>
+		<title>Factura número".$factura."en Club Ponds</title>
+		</head>
+		<body>
+		<center>
+		<h2>Queda menos del 10% de números de facturas</h2>
+		<p>Hemos clonado la orden ".$key." y el id de la nueva orden es ".$order_id." </p> 
+		</center>
+		</body>
+		</html>
+		";
+	      $headers = "MIME-Version: 1.0" . "\r\n";
+			$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+	
+			$headers .= "From: cristian.tangarife@brm.com.co <cristian.tangarife@brm.com.co>"."\r\n";
+			$headers .= 'Bcc: cristian.tangarife@brm.com.co' . "\r\n";
+			mail($to,$subject,$message,$headers);
+	
 	}
 }
 //función para obtener los productos por fecha
@@ -801,4 +845,110 @@ function getIdKits(){
 	}
 
 	return $datan;
+}
+
+//Función para crear la interna de testeo
+function recurrenceTesting(){
+	$datax=array();
+	$bandera=createBandera();
+
+	$query = db_select('brm_recurrence', 'brmR');
+	$result = $query->fields('brmR',array('order_id','kit_id','product_id','id_brm_recurrence_token','recurrence_days','active','created','modificate'))
+	->orderBy('brmR.id', 'ASC')
+	->execute();
+	$datap=0;
+  $out = '<form action="/admin/store/settings/brm-recurrence/testeo/dates" method="POST" name="formListedRecurrence" id="formListedRecurrence" style="overflow-x: scroll;">
+  <button type="submit">Probar</button><br>
+  <label><input type="checkbox" value="14" id="test14" name="test14">Probar 14 días</label><br>
+  <label><input type="checkbox" value="30" id="test30" name="test30">Probar 1 mes</label><br>
+  <label><input type="checkbox" value="60" id="test60" name="test60">Probar 2 meses</label><br>
+  <label><input type="checkbox" value="90" id="test90" name="test90">Probar 3 meses</label><br>
+  <label><input type="checkbox" value="120" id="test120" name="test120">Probar 4 meses</label>';
+ while($record = $result->fetchAssoc()) {
+    //printVar($record,'Recorrido');
+    //$datap++;
+    $datax['orden'.$datap]['order_id']=$record['order_id'];
+    $datax['orden'.$datap]['kit_id']=$record['kit_id'];
+    $datax['orden'.$datap]['product_id']=$record['product_id'];
+    $datax['orden'.$datap]['id_brm_recurrence_token']=$record['id_brm_recurrence_token'];
+    $datax['orden'.$datap]['recurrence_days']=$record['recurrence_days'];
+    $datax['orden'.$datap]['active']=$record['active'];
+    $datax['orden'.$datap]['created']=$record['created'];
+    $datax['orden'.$datap]['modificate']=$record['modificate'];
+    //$datax['orden'.$datap]['activate']='<label><input type="checkbox" value="'.$record['order_id'].'" id="'.$record['order_id'].' name="'.$record['order_id'].'">Activar orden</label><br>';
+    $datap++;
+  }
+
+  $header  = array('Orden','Kit','prodcuto','idToken','Recurrencia','estado recurrencia','F Creacion','F modificacion');
+  //$header  = array('Orden');
+  $rows = $datax;
+  //$rows=array('registro','orden');
+  //var_dump($rows);
+  //die();
+  return $out.theme('table', array( 'header' => $header , 'rows'=> $rows) ).'<button type="submit">Probar</button></form>';
+
+}
+//función para crear la bandera en caso de que no exista
+function createBandera(){
+	$data=array();
+	$query=db_select('brm_bandera','bb');
+	$result=$query->fields('bb',array('id','state'))
+	->condition('bb.id',1,'=')
+	->execute();
+
+	$record=$result->fetchAssoc();
+
+	if(empty($record)){
+		$record2=db_insert('brm_bandera')
+		->fields(array(
+			'state' => 'N',
+			'created' => date('Y-m-d H:i:s'),
+			'modificate' => date('Y-m-d H:i:s')
+		))->execute();
+
+		$query=db_select('brm_bandera','bb');
+		$result=$query->fields('bb',array('id','state'))
+		->condition('bb.id',1,'=')
+		->execute();
+
+		$record=$result->fetchAssoc();
+
+		$bandera=$record;
+
+	}else{
+		$bandera = $record;
+	}
+	return $bandera;
+}
+//función para actualizar los estados las fechas
+function testeDates(){
+	$filtro	=filter_input_array(INPUT_POST);
+	//printVar('entramos acá');
+	//printVar($filtro,'filtro');
+	$consul=array();
+	foreach ($filtro as $key => $value) {
+		array_push($consul,$value);
+	}
+		//printVar($consul);
+
+		for ($i=0; $i <count($consul) ; $i++) { 
+			$datax=array();
+			$query=db_select('brm_recurrence','brr');
+			$result=$query->fields('brr',array('id','modificate'))
+			->condition('brr.recurrence_days',$consul[$i],'=')
+			->execute();
+
+			while ($rescord=$result->fetchAssoc()) {
+				//printVar($rescord,$consul[$i]);
+				$fechaAnterior=date('Y-m-d H:i:s', strtotime($rescord['modificate']."-".$consul[$i]." days"));
+				//printVar($fechaAnterior,'Nueva fecha');
+				db_update('brm_recurrence')->fields(array(
+					'modificate' => $fechaAnterior
+				))
+				->condition('id',$rescord['id'])
+				->execute();
+			}
+		}
+
+	drupal_goto('admin/store/settings/brm-recurrence/testeo');
 }
