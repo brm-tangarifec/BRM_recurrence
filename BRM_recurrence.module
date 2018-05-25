@@ -327,6 +327,7 @@ function saveProductsByOrder($order_id,$campos,$time){
 		$result=$query->fields('br',array('id'))
 		->condition('br.order_id',$order_id,'=')
 		->condition('br.product_id',$campos[$i]['nid'],'=')
+		->condition('br.active','y','=')
 		->condition('br.recurrence_days',$time,'=')
 		->condition('br.kit_id',$dataU['kit_id'],'=')
 		->execute();
