@@ -190,6 +190,7 @@ function recurrenceTest(){
 			      	//BRM_ponds_kit_uc_add_to_cart();
 			      
 			      	//$orderC->products = $productsNewOrder;
+			      	//Si el id del producto y la orden 
 			      	$message='Orden creada para recurrencia obtenida de la orden '.$key;
 			      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
 			      	//printVar(lineItemsOrder($key),$key);
@@ -316,12 +317,24 @@ function updateLineShipping($orde_id,$amount){
 	//die();
 }
 //función para insertar los productos por orden
-function saveProductsByOrder($order_id,$campos){
+function saveProductsByOrder($order_id,$campos,$time){
 	//printVar($campos,$order_id);
 	for ($i=0; $i <count($campos) ; $i++) { 
 		//printVar($campos[$i]);
-		$return = db_insert('uc_order_products')
-		->fields(array(
+		//Si el id del producto y la orden
+		$dataU=unserialize($campos[$i]['data']);
+		$query=db_select('brm_recurrence','br');
+		$result=$query->fields('br',array('id'))
+		->condition('br.order_id',$order_id,'=')
+		->condition('br.product_id',$campos[$i]['nid'],'=')
+		->condition('br.recurrence_days',$time,'=')
+		->condition('br.kit_id',$dataU['kit_id'],'=')
+		->execute();
+		$record=$result->fetchAssoc();
+		//Hasta acá
+		if(!empty($record)){
+			$return = db_insert('uc_order_products')
+			->fields(array(
 			'order_id' => $order_id,
 			'nid' => $campos[$i]['nid'],
 			'title' => $campos[$i]['title'],
@@ -332,8 +345,8 @@ function saveProductsByOrder($order_id,$campos){
 			'weight'=>$campos[$i]['weight'],
 			'weight_units'=>$campos[$i]['weight_units'],
 			'data'=>$campos[$i]['data'],
-		))->execute();
-//		return $return;
+			))->execute();
+		}
 	}
 }
 //Función para obtener los datos de la orden
@@ -352,7 +365,7 @@ function getLastOrderProduct(){
 	$query=db_select('uc_order_products','uop');
 	$result=$query->fields('uop',array('order_product_id'))
 	->range(0, 1)
-	->orderBy('order_product_id', 'DESC')
+	->orderBy('uop.order_product_id', 'DESC')
 	->execute();
 	$record=$result->fetchAssoc();
 	//printVar($record['order_product_id']);
@@ -497,10 +510,11 @@ function custonOrderCreate(){
 				      	$productInt=array();
 				      	$productsOrders=getProducDataByOrder($key);
 				      	//printVar($productsOrders,'Los productos');
-				      	saveProductsByOrder($order_id,$productsOrders);
+				      	saveProductsByOrder($order_id,$productsOrders,$recurrencia[$i]);
 				      	//BRM_ponds_kit_uc_add_to_cart();
 				      
 				      	//$orderC->products = $productsNewOrder;
+				      	//Si el id del producto y la orden 
 				      	$message='Orden creada para recurrencia obtenida de la orden '.$key;
 				      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
 				      	//printVar(lineItemsOrder($key),$key);
