@@ -559,43 +559,23 @@ function custonOrderCreate(){
 				      //Se guarda la orden
 				      //printVar(uc_order_product_revive($order->products),'Productos');
 				      uc_order_save($orderC);
-
-				      //$ordenS=uc_order_load($order_id);
-
-				      
-				      /*if($total!=$ordenS->order_total){
-				      	recurrenceTotal($ordenS->order_id,$total);
-				      }*/
-				      
+			      
 				      //Se debe actualizar el estado de la orden para separlas
+
+					//Se envía un email al correo registrado
+				    $to = variable_get('BRM_recurrence_mail_informer','');
+					$subject = "Aproximación al tope de facturación Club Ponds";
+					$message = "<html><head><title>Factura número".$factura."en Club Ponds</title></head><body><center><h2>Queda menos del 10% de números de facturas</h2><p>Hemos clonado la orden ".$key." y el id de la nueva orden es ".$order_id." </p></center></body></html>";
+					$headers = "MIME-Version: 1.0" . "\r\n";
+					$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+					$headers .= "From: cristian.tangarife@brm.com.co <cristian.tangarife@brm.com.co>"."\r\n";
+					$headers .= 'Bcc: cristian.tangarife@brm.com.co' . "\r\n";
+					mail($to,$subject,$message,$headers);
 				}
 			}
 		}
 		//Se baja la bandera al crear las ordenes
 		bajarBandera();
-
-		//Se envía un email al correo registrado
-		$to = variable_get('BRM_recurrence_mail_informer','');
-		$subject = "Aproximación al tope de facturación Club Ponds";
-		$message = "
-		<html>
-		<head>
-		<title>Factura número".$factura."en Club Ponds</title>
-		</head>
-		<body>
-		<center>
-		<h2>Queda menos del 10% de números de facturas</h2>
-		<p>Hemos clonado la orden ".$key." y el id de la nueva orden es ".$order_id." </p> 
-		</center>
-		</body>
-		</html>
-		";
-	      $headers = "MIME-Version: 1.0" . "\r\n";
-			$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-	
-			$headers .= "From: cristian.tangarife@brm.com.co <cristian.tangarife@brm.com.co>"."\r\n";
-			$headers .= 'Bcc: cristian.tangarife@brm.com.co' . "\r\n";
-			mail($to,$subject,$message,$headers);
 	
 	}
 }
