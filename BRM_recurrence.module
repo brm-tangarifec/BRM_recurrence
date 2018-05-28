@@ -471,7 +471,7 @@ function getProducsByOrder($order_id){
 function custonOrderCreate(){
 	//Función de prueba, migrar a la función que crea las ordenes
 	//Se comprueba que la bandera se encuentre arriba, para ejecutar
-	subirBandera();
+	//subirBandera();
 	if(getBanderaRecurrence()=="S"){
 		//Se estipulan los tiempos
 		$recurrencia=array('14','30','60','90','120');
@@ -742,6 +742,66 @@ function BRM_recurrence_cronapi() {
 	$huorD=variable_get('BRM_recurrence_hour_down', '');
 	$downHor=explode(':',$huorD);
 
+	switch ($onlyHour[1]) {
+		case '00':
+			$ini=60;
+			$upBandera=$ini-5;
+			if($onlyHour[0]=='00'){
+				$hora=24;
+			}else{
+				$hora=(int)$onlyHour[0];
+			}
+			$hUpBandera=$hora-1;
+			break;
+		case '01':
+			$ini=61;
+			$upBandera=$ini-5;
+			if($onlyHour[0]=='00'){
+				$hora=24;
+			}else{
+				$hora=(int)$onlyHour[0];
+			}
+			$hUpBandera=$hora-1;
+			break;
+		case '02':
+			$ini=62;
+			$upBandera=$ini-5;
+			if($onlyHour[0]=='00'){
+				$hora=24;
+			}else{
+				$hora=(int)$onlyHour[0];
+			}
+			$hUpBandera=$hora-1;
+			break;
+		case '03':
+			$ini=63;
+			$upBandera=$ini-5;
+			if($onlyHour[0]=='00'){
+				$hora=24;
+			}else{
+				$hora=(int)$onlyHour[0];
+			}
+			$hUpBandera=$hora-1;
+			break;
+		case '04':
+			$ini=64;
+			$upBandera=$ini-5;
+			if($onlyHour[0]=='00'){
+				$hora=24;
+			}else{
+				$hora=(int)$onlyHour[0];
+			}
+			$hUpBandera=$hora-1;
+			break;
+		
+		default:
+			$ini=(int)$onlyHour[1];
+			$upBanderaC=$ini-5;
+			$hUpBandera=$onlyHour[0];
+			$upBandera = str_pad($upBanderaC, 2, '0', STR_PAD_LEFT);
+			break;
+	}
+
   $items = array();
   //Se baja la bandera
   $items['bajar_bandera'] = array(
@@ -753,6 +813,24 @@ function BRM_recurrence_cronapi() {
       'name' => 'crontab',
       'crontab' => array(
         'rules' => array($downHor[1].' '.$downHor[0].' * * *'),
+      ),
+    ),
+    'launcher' => array(
+      'name' => 'serial',
+      'serial' => array(
+        'thread' => 'any',
+      ),
+    ),
+  );
+  $items['subir_bandera'] = array(
+    'title' => t('Subir la Bandera'),
+    'callback' => 'subirBandera',
+    'enabled' => TRUE,
+    'tags' => array('Recurrencia'),
+    'scheduler' => array(
+      'name' => 'crontab',
+      'crontab' => array(
+        'rules' => array($upBandera.' '.$hUpBandera.' * * *'),
       ),
     ),
     'launcher' => array(
