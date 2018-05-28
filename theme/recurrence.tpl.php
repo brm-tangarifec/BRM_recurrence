@@ -30,7 +30,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
 
 <div class="row">
-	<form action="" class="uc-cart-checkout-form">
+	<form action="/test/recurrence" class="uc-cart-checkout-form-recurrence">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>
@@ -84,11 +84,12 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				</div>
 				<div id="uc-store-address-delivery-zone-wrapper"><div class="form-item form-type-select form-item-panes-delivery-delivery-zone">
 				  <label for="edit-panes-delivery-delivery-zone"><span class="form-required" title="Este campo es obligatorio.">*</span> Departamento </label>
-				 <select id="edit-panes-delivery-delivery-zone" name="panes[delivery][delivery_zone]" class="form-select"><option value="0" selected="selected">- Seleccionar -</option><option value="92">Distrito Capital de Bogota</option></select>
+				 <select id="edit-panes-delivery-delivery-zone" name="panes[delivery][delivery_zone]" class="form-select"><option value="0" selected="selected">- Seleccionar -</option><option value="Bogotá D.C">Distrito Capital de Bogota</option></select>
 				</div><div class="clearfix"></div>
 				</div><div class="form-item form-item-panes-delivery-delivery-city form-type-select">
 				  <label for="edit-panes-delivery-delivery-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
-				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text hidden" readonly="readonly">
+				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option>
+				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text hidden" readonly="readonly">
 				</div>
 				<div class="form-item form-type-select form-item-panes-delivery-delivery-country">
 				  <label for="edit-panes-delivery-delivery-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
