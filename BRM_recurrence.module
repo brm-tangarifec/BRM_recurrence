@@ -553,7 +553,7 @@ function getProducDataByOrder($order_id){
 //función para actualizar el token y estado de la orden recurrente
 function updateRecurrenceByOrden($order_id,$tokenId){
 	db_update('brm_recurrence')->fields(array(
-    "id_brm_recurrence_token"=>$tokenId,,
+    "id_brm_recurrence_token"=>$tokenId,
     "modificate"=> date('Y-m-d H:i:s'),
     ))
    ->condition('order_id', $order_id)
