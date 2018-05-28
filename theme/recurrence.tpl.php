@@ -30,7 +30,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
 
 <div class="row">
-	<form action="/test/recurrence" class="uc-cart-checkout-form-recurrence">
+	<form action="/test/recurrence" class="uc-cart-checkout-form">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>

@@ -87,6 +87,17 @@ function BRM_recurrence_schema() {
           'length'    => 150,
           'not null'  => TRUE
         ),
+        'franchise'  => array(
+          'type'      => 'varchar',
+          'length'    => 80,
+          'not null'  => TRUE
+        ),
+        'active' => array(
+        'type' => 'varchar',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 'n',
+        ),
         'date'  => array(
           'mysql_type' => 'DATETIME',
           'not null'  => TRUE
