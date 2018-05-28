@@ -46,6 +46,10 @@ function BRM_recurrence_schema() {
         'not null' => TRUE,
         'default' => 'n',
       ),
+      'deferred' => array(
+        'type' => 'int',
+       'not null' => TRUE
+      ),
       'created' => array(
         'mysql_type' => 'DATETIME',
         'not null' => TRUE,

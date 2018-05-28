@@ -553,8 +553,7 @@ function getProducDataByOrder($order_id){
 //función para actualizar el token y estado de la orden recurrente
 function updateRecurrenceByOrden($order_id,$tokenId){
 	db_update('brm_recurrence')->fields(array(
-    "id_brm_recurrence_token"=>$tokenId,
-    "active"=>'y',
+    "id_brm_recurrence_token"=>$tokenId,,
     "modificate"=> date('Y-m-d H:i:s'),
     ))
    ->condition('order_id', $order_id)
@@ -977,3 +976,24 @@ function testeDates(){
 	drupal_goto('admin/store/settings/brm-recurrence/testeo');
 }
 
+//función para actualizar el número de cuotas a la orden seleccionada
+
+function recurrenceDeferred($order_id,$deferred){
+	db_update('brm_recurrence')->fields(array(
+			"deferred"=>$deferred,
+			"modificate" =>date('Y-m-d H:i:s')
+		))
+		->condition('order_id',$order_id,'=')
+		->execute();
+}
+
+//función para actualizar los estados a y cuando el módulo payu responda 4 "payment_received"
+
+function updateActiveRecurrenceByOrden($order_id){
+	db_update('brm_recurrence')->fields(array(
+    "active"=>'y',
+    "modificate"=> date('Y-m-d H:i:s'),
+    ))
+   ->condition('order_id', $order_id)
+   ->execute();
+}
