@@ -120,6 +120,12 @@ function BRM_recurrence_schema() {
         'length'    => 5,
         'not null'  => TRUE
       ),
+      'descrt' => array(
+        'description' => 'this field is for described the bandera',
+        'type'      => 'varchar',
+        'length'    => 100,
+        'not null'  => TRUE
+      ),
       'created' => array(
         'mysql_type' => 'DATETIME',
         'not null' => TRUE
@@ -145,9 +151,23 @@ function BRM_recurrence_schema() {
  * Implements hook_install().
  */
 function BRM_recurrence_install() {
+  $fecha=date('Y-m-d H:i:s');
   variable_set('BRM_recurrence_mail_informer', '');
   variable_set('BRM_recurrence_hour_request', '');
   variable_set('BRM_recurrence_hour_down', '');
+
+  /**
+ * Implements hook_install().
+ */
+  // Insertar un registro en la tabla al momento de crearla.
+  db_insert('brm_bandera')
+  ->fields(array(
+    'state' => 'N',
+    'descrt' => 'Bandera para ejecutar el cron',
+    'created' => $fecha,
+    'modificate' => $fecha
+  ))
+  ->execute();
 }
 
 /**

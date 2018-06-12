@@ -51,6 +51,13 @@ function BRM_recurrence_menu() {
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
     ),
+    //Ruta para el submit del formulario
+    'cart/recurrence/checkout'=> array(
+  	'page callback' => 'recurrencecheck',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -808,7 +815,8 @@ function verifyCC(){
 
 	if($post['vartC']=='verify'){
 		$franquicia=check_cc($post['consul']);
-		printVar($franquicia);
+		//printVar($franquicia);
+		drupal_json_output(strtoupper($franquicia));
 
 	}
 }
@@ -996,4 +1004,143 @@ function updateActiveRecurrenceByOrden($order_id){
     ))
    ->condition('order_id', $order_id)
    ->execute();
+}
+
+function recurrencecheck(){
+	$varPost=filter_input_array(INPUT_POST);
+	global $user;
+	//printVar($user);
+	$params=array();
+	//datsos para creación de token
+	$params['nombre']=$varPost['tarjetahabiente'];
+	$params['cedula']=$varPost['cedulahabiente'];
+	$params['numtc']=$varPost['numtc'];
+	$params['expiration']=$varPost['aaaa'].'/'.$varPost['mm'];
+	$params['franquicia']=$varPost['franquicia'];
+	$params['cosec']=$varPost['cosec'];
+	$params["cuotas"]=$varPost['cuotas'];
+
+
+	//Datos para la orden
+	$params['BUYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
+	$params['BUYER_EMAIL']=$user->mail;
+	$params['BUYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+	$params['BUYER_DNI']=$varPost['cedulahabiente'];
+	$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));;
+	$params['BUYER_STREET_2']='';
+	$params['BUYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
+	$params['BUYER_STATE']=$varPost['panes']['delivery']['delivery_zone'];
+	$params['BUYER_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+
+	if($varPost['panes']['billing']['copy_address']=='1'){
+		$params['PAYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
+		$params['PAYER_EMAIL']=$user->mail;
+		$params['PAYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+		$params['PAYER_DNI']=$varPost['cedulahabiente'];
+		$params['PAYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));
+		$params['PAYER_STREET_2']='';
+		$params['PAYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
+		$params['PAYER_STATE']=$varPost['panes']['delivery']['delivery_zone'];
+		$params['PAYER_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+	}else{
+		$params['PAYER_NAME']=$varPost['panes']['billing']['billing_first_name'].' '.$varPost['panes']['billing']['billing_last_name'];
+		$params['PAYER_EMAIL']=$user->mail;
+		$params['PAYER_CONTACT_PHONE']=$varPost['panes']['billing']['billing_phone'];
+		$params['PAYER_DNI']=$varPost['cedulahabiente'];
+		$params['PAYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['billing']['billing_street1']));
+		$params['PAYER_STREET_2']='';
+		$params['PAYER_CITY']=$varPost['panes']['billing']['billing_city'];
+		$params['PAYER_STATE']=$varPost['panes']['billing']['billing_zone'];
+		$params['PAYER_PHONE']=$varPost['panes']['billing']['billing_phone'];
+	}
+//die();
+	//Se obtiene la recurrencia por usuario
+	$orderActive=getLastOrderUser($user->uid);
+	//printVar($orderActive,'Orden activa');
+	// Create a new order if necessary.
+	//printVar($orderActive);
+	$order_id = $orderActive['order_id'];
+	//Se carga el iva
+	$orderC = uc_order_load($order_id);
+	//printVar($orderC);
+	//die();
+	$orderC->delivery_first_name=$varPost['panes']['delivery']['delivery_first_name'];
+	$orderC->delivery_last_name=$varPost['panes']['delivery']['delivery_last_name'];
+	$orderC->delivery_phone=$orderLoad->delivery_phone;
+	$orderC->delivery_street1=$orderLoad->delivery_street1;
+	$orderC->delivery_city=$orderLoad->delivery_city;
+	$orderC->delivery_zone=$orderLoad->delivery_zone;
+	$orderC->delivery_country=$orderLoad->delivery_country;
+	if($varPost['panes']['billing']['copy_address']=='1'){
+		$orderC->billing_first_name=$varPost['panes']['delivery']['delivery_first_name'];
+		$orderC->billing_last_name=$varPost['panes']['delivery']['delivery_last_name'];
+		$orderC->billing_phone=$varPost['panes']['delivery']['delivery_phone'];
+		$orderC->billing_street1=$varPost['panes']['delivery']['delivery_street1'];
+		$orderC->billing_city=$varPost['panes']['delivery']['delivery_city'];
+		$orderC->billing_zone=$varPost['panes']['delivery']['delivery_zone'];
+	}else{
+		$orderC->billing_first_name=$varPost['panes']['billing']['billing_first_name'];
+		$orderC->billing_last_name=$varPost['panes']['billing']['billing_last_name'];
+		$orderC->billing_phone=$varPost['panes']['billing']['billing_phone'];
+		$orderC->billing_street1=$varPost['panes']['billing']['billing_street1'];
+		$orderC->billing_city=$varPost['panes']['billing']['billing_city'];
+		$orderC->billing_zone=$varPost['panes']['billing']['billing_zone'];
+	}
+	$orderC->payment_method = 'payulatam';
+	$cuponActive='';
+	$dataUns['coupons']='';
+	$dataUns=serialize($dataUns);
+	$orderC->data=$dataUns;
+	//se envia la orden
+	$params['orderId']=$order_id;
+	//Se guarda la orden
+	 //printVar(uc_order_product_revive($order->products),'Productos');
+	uc_order_save($orderC);
+
+	$params['value']=$orderC->order_total;
+
+	//función para creación del token y cobro de payú
+	$tokenJson=validDataFormPayU($params);
+
+	printVar($tokenJson,'HOla Json');
+	//actualiza el token
+	if($tokenJson->transactionResponse->state=='APPROVED'){
+		$watchdog_variables = array(
+			'!order_id' => $order_id,
+			'!current_order_status' => $orderC->order_status,
+			'!reference_pol' => check_plain('1 Transacción aprobada'),
+		);
+		$comment = t("Order Completed.") . ' ' . t("PayU Latam # !reference_pol", $watchdog_variables);
+       	uc_order_comment_save($order_id, 0, $comment, 'order');
+       	$plata = (int)$orderC->order_total;
+       	$plata2 = (string)$plata;
+		//$orderC->order_status='payment_received';
+		uc_payment_enter($order_id, 'payulatam',$plata2, 0, NULL, $comment);
+		uc_order_update_status($order_id, 'payment_received');
+		updateActiveRecurrenceByOrden($order_id);
+	}elseif($tokenJson->transactionResponse->state=='DECLINED'){
+		printVar($tokenJson->transactionResponse->responseMessage);
+	}
+
+	die();
+}
+
+function getDataToken($idBrmToken){
+	$datax=array();
+	$query=db_select('brm_recurrence_token','bt');
+	$result=$query->fields('br',array('user_id','card_mask','token','franchise','active'))
+	->condition('bt.active','S','=')
+	->condition('bt.id',$idBrmToken,'=')
+	->execute();
+
+	$datap=0;
+	while ($record=$result->fetchAssoc()) {
+		$datax[$datap]['user_id']=$record['user_id'];
+		$datax[$datap]['card_mask']=$record['card_mask'];
+		$datax[$datap]['token']=$record['token'];
+		$datax[$datap]['franchise']=$record['franchise'];
+		$datap++;
+	}
+
+	return $datax;
 }

@@ -28,9 +28,9 @@ $envio=shippingRecurrence($variables['idKits'],$subtotal);
 //Se agrega el Valor del envío a la orden
 updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
-
+<script type="text/javascript" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></script> <noscript> <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></iframe> </noscript>
 <div class="row">
-	<form action="/test/recurrence" class="uc-cart-checkout-form">
+	<form action="/cart/recurrence/checkout" class="uc-cart-checkout-form">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>
@@ -154,6 +154,23 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 			<div class="fiedset-wrapper">
 				
+				<div class="form-item">
+					<label for="franquicia">Nombre Tarjetahabiente</label>
+					<input type="text" id="tarjetahabiente" name="tarjetahabiente">
+				</div>
+				<div class="form-item">
+					<label for="franquicia">Cédula Tarjetahabiente</label>
+					<input type="text" id="cedulahabiente" name="cedulahabiente">
+				</div>
+				<div class="form-item">
+					<label for="franquicia">Cuotas</label>
+					<input type="number" name="cuotas" step="1" min="1" max="36">
+				</div>
+				<div class="form-item">
+					<label for="franquicia">Cédula Tarjetahabiente</label>
+					<input type="text" id="cedulahabiente" name="cedulahabiente">
+				</div>
+
 				<div class="form-item">
 					<label for="franquicia">Franquicia</label>
 					<input type="text" id="franquicia" name="franquicia">
