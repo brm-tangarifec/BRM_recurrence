@@ -97,6 +97,9 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
       'tesnting' => array(
         'template' => 'theme/testrecurrence'
       ),
+      'feedback' => array(
+        'template' => 'theme/recurrence-feedback'
+      ),
   );
 }
 
@@ -1118,9 +1121,15 @@ function recurrencecheck(){
 		uc_payment_enter($order_id, 'payulatam',$plata2, 0, NULL, $comment);
 		uc_order_update_status($order_id, 'payment_received');
 		updateActiveRecurrenceByOrden($order_id);
+		$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
+
 	}elseif($tokenJson->transactionResponse->state=='DECLINED'){
 		printVar($tokenJson->transactionResponse->responseMessage);
+		$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
 	}
+
+	$variables['messagePonds'] = $responseMessage;
+    return theme('feedback',$variables);
 
 	die();
 }
