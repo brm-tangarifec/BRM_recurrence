@@ -46,6 +46,15 @@
 	color:black;
 }
 
+.btn-recurrence{
+	margin: 1rem auto !important;
+}
+
+.text-title-recurrence{
+	color:#20b7c8;
+	font-size: 2.5rem;
+	margin:1rem auto;
+}
 
 .badge{
 	background-color: black;
@@ -56,3 +65,4 @@
 	padding:0.5rem 1rem;
 	text-align: center;
 }
+
