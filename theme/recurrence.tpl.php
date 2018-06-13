@@ -90,7 +90,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div class="form-item form-item-panes-delivery-delivery-city form-type-select">
 				  <label for="edit-panes-delivery-delivery-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
 				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option>
-				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text">
+				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="92" size="32" maxlength="128" class="form-text hidden">
 				</div>
 				<div class="form-item form-type-select form-item-panes-delivery-delivery-country">
 				  <label for="edit-panes-delivery-delivery-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
@@ -177,7 +177,6 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<input type="num" id="numtc" name="numtc">
 				</div>
 
-				<div class="clearfix"></div>
 				<div class="form-item form-fecha-tc">
 					<label for="ven">Fecha de Vencimiento</label>
 					<div class="clearfix"></div>
@@ -185,8 +184,9 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<input class="form-tc" type="num"  maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
 					<div class="clearfix"></div>
 				</div>
+				<div class="clearfix"></div>
 
-				<div class="form-item">
+				<div class="form-item push-half">
 					<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
 					<input type="num" id="cosec" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
 
