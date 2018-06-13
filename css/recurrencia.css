@@ -58,7 +58,7 @@
 .text-title-recurrence{
 	color:#20b7c8;
 	font-size: 2.5rem;
-	margin:1rem auto;
+	margin:16rem auto 1rem !important;
 }
 
 .badge{
