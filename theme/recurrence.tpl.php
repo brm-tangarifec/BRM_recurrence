@@ -30,7 +30,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
 <script type="text/javascript" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></script> <noscript> <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></iframe> </noscript>
 <div class="row">
-	<form action="/cart/recurrence/checkout" class="uc-cart-checkout-form">
+	<form action="/cart/recurrence/checkout" class="uc-cart-checkout-form" method="POST">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>
@@ -90,7 +90,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div class="form-item form-item-panes-delivery-delivery-city form-type-select">
 				  <label for="edit-panes-delivery-delivery-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
 				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option>
-				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text hidden" readonly="readonly">
+				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text">
 				</div>
 				<div class="form-item form-type-select form-item-panes-delivery-delivery-country">
 				  <label for="edit-panes-delivery-delivery-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
@@ -130,7 +130,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		</div><div class="clearfix"></div>
 		</div><div class="form-item form-item-panes-billing-billing-city form-type-select">
 		  <label for="edit-panes-billing-billing-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
-		 <select class="ciudadSE form-select form-type-select" id="ciudadSE" disabled="disabled"><option val="">--Seleccionar--</option></select><input type="text" id="edit-panes-billing-billing-city" name="panes[billing][billing_city]" value="BOGOTA D.C." size="32" maxlength="128" class="form-text hidden" readonly="readonly">
+		 <select class="ciudadSE form-select form-type-select" id="ciudadSE" disabled="disabled"><option val="">--Seleccionar--</option></select><input type="text" id="edit-panes-billing-billing-city" name="panes[billing][billing_city]" value="BOGOTA D.C." size="32" maxlength="128" class="form-text hidden">
 		</div>
 		<div class="form-item form-type-select form-item-panes-billing-billing-country">
 		  <label for="edit-panes-billing-billing-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
@@ -167,11 +167,6 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<label for="franquicia">Cuotas</label>
 					<input type="number" name="cuotas" step="1" min="1" max="36">
 				</div>
-				<div class="form-item">
-					<label for="franquicia">Cédula Tarjetahabiente</label>
-					<input type="text" id="cedulahabiente" name="cedulahabiente">
-				</div>
-
 				<div class="form-item">
 					<label for="franquicia">Franquicia</label>
 					<input type="text" id="franquicia" name="franquicia">

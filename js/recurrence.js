@@ -88,8 +88,8 @@ jQuery('#numtc').blur(function(r){
 		},
 
 			success: function(data){
-			  console.log(data);      
-			  
+			  //console.log(data);      
+			  jQuery('#.franquicia').val(data);
 			}
 		});
 	}
