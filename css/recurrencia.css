@@ -51,6 +51,7 @@
 }
 
 .btn-recurrence{
+	display: block;
 	margin: 1rem auto !important;
 }
 
