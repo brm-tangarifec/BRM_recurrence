@@ -149,9 +149,47 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 		<!-- Frecuencia -->
 		<fieldset class="form-wrapper" id="recurrencia">
-			<legend>
-				Configuración de Frecuencia de Pago
-			</legend>
+
+			<legend>Frecuencia de pago</legend>
+
+			<div class="wrap-tarjetas">
+				<h3 class="text-center">Tarjetas vinculadas</h3>
+				<div class="col-md-4 col-md-offset-4">
+					<!-- Acordeon tarjetas -->
+					<div class="panel-group" id="accordionCard" role="tablist" aria-multiselectable="true">
+					  <!--Desde acá-->
+					  <?php
+					  $getCard=getDataTokerPerUser($userR->uid);
+					  //printVar($getCard);
+					  foreach ($getCard as $key => $card) {
+					  	//printVar($card);
+					  	$franquicia=$card['franchise'];
+					  	$carMask=substr($card['card_mask'],-4);
+					  	?>
+					  	<div class="panel panel-default">
+					    <div class="panel-heading" role="tab" id="heading<?php print($key);?>">
+					      <h4 class="panel-title">
+					        <a class="collapsed">
+					          <img src="<?php print(base_path().path_to_theme());?>/images/tarjetas/<?php print(strtolower($franquicia))?>.jpg" alt="Visa">
+					          <?php print(ucfirst($franquicia))?> terminada en <?php print($carMask)?>
+					        </a>
+					      </h4>
+					    </div>
+					    
+					  </div>
+					  <?php }  ?>
+					  <!--Hasta acá-->
+					</div>
+					<!--/- Acordeon tarjetas -->
+				</div>
+			
+			</div>
+
+			<div class="clearfix"></div>
+
+			<h3 class="text-center">
+				Agrega una nueva Frecuencia de Pago
+			</h3 class="center">
 
 			<div class="fiedset-wrapper">
 				

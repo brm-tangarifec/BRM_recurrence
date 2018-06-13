@@ -1128,7 +1128,7 @@ function recurrencecheck(){
 			$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
 			BRM_invoice_create_number($order_id);
 		}elseif($tokenJson->transactionResponse->state=='DECLINED'){
-			printVar($tokenJson->transactionResponse->responseMessage);
+			//printVar($tokenJson->transactionResponse->responseMessage);
 			$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
 		}
 	}else{
@@ -1158,5 +1158,23 @@ function getDataToken($idBrmToken){
 		$datap++;
 	}
 
+	return $datax;
+}
+
+//Función para obtener las tarjetas inscritas para el usuario
+function getDataTokerPerUser($userId){
+	$datax=array();
+	$query=db_select('brm_recurrence_token','brt');
+	$result=$query->fields('brt',array('card_mask','franchise'))
+		->condition('brt.user_id',$userId,'=')
+		->condition('brt.active','S','=')
+		->execute();
+	$datap=0;
+	while ($record=$result->fetchAssoc()) {
+		//printVar($record);
+		$datax[$datap]['card_mask']=$record['card_mask'];
+		$datax[$datap]['franchise']=$record['franchise'];
+		$datap++;
+	}
 	return $datax;
 }
