@@ -52,7 +52,7 @@ function BRM_recurrence_menu() {
   	'type' => MENU_CALLBACK,
     ),
     //Ruta para el submit del formulario
-    'cart/recurrence/checkout'=> array(
+    'cart/recurrence/checkout-recurrence'=> array(
   	'page callback' => 'recurrencecheck',
   	'access arguments' => TRUE,
   	'access callback' => TRUE,
@@ -1073,10 +1073,10 @@ function recurrencecheck(){
 	if($orderC->order_status=='in_checkout'){
 		$orderC->delivery_first_name=$varPost['panes']['delivery']['delivery_first_name'];
 		$orderC->delivery_last_name=$varPost['panes']['delivery']['delivery_last_name'];
-		$orderC->delivery_phone=$orderLoad->delivery_phone;
-		$orderC->delivery_street1=$orderLoad->delivery_street1;
-		$orderC->delivery_city=$orderLoad->delivery_city;
-		$orderC->delivery_zone=$orderLoad->delivery_zone;
+		$orderC->delivery_phone=$varPost['panes']['delivery']['delivery_phone'];
+		$orderC->delivery_street1=$varPost['panes']['delivery']['delivery_street1'];
+		$orderC->delivery_city=$varPost['panes']['delivery']['delivery_city'];
+		$orderC->delivery_zone=$varPost['panes']['delivery']['delivery_zone'];
 		$orderC->delivery_country=$orderLoad->delivery_country;
 		if($varPost['panes']['billing']['copy_address']=='1'){
 			$orderC->billing_first_name=$varPost['panes']['delivery']['delivery_first_name'];

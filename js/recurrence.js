@@ -89,12 +89,40 @@ jQuery('#numtc').blur(function(r){
 
 			success: function(data){
 			  //console.log(data);      
-			  jQuery('#.franquicia').val(data);
+			  jQuery('#franquicia').val(data);
 			}
 		});
 	}
 });
 
+//Pasar datos si está deschekeado mi direccion de facturación es la misma
+jQuery('#edit-panes-billing-copy-address').change(function(){
+  if(jQuery(this).prop("checked")) {
+    jQuery('#edit-panes-billing-address--2').addClass('hidden');
+  } else {
+    jQuery('#edit-panes-billing-address--2').removeClass('hidden');
+  }
+});
+
+
+jQuery('#edit-panes-delivery-delivery-first-name').blur(function(){
+	jQuery('#edit-panes-billing-billing-first-name').val(jQuery('#edit-panes-delivery-delivery-first-name').val());
+});
+jQuery('#edit-panes-delivery-delivery-last-name').blur(function(){
+	jQuery('#edit-panes-billing-billing-last-name').val(jQuery('#edit-panes-delivery-delivery-last-name').val());
+});
+jQuery('#edit-panes-delivery-delivery-street1').blur(function(){
+	jQuery('#edit-panes-billing-billing-street1').val(jQuery('#edit-panes-delivery-delivery-street1').val());
+});
+jQuery('#edit-panes-delivery-delivery-zone').blur(function(){
+	jQuery('#edit-panes-billing-billing-zone').val(jQuery('#edit-panes-delivery-delivery-zone').val()).change();
+});
+jQuery('#edit-panes-delivery-delivery-country').blur(function(){
+	jQuery('#edit-panes-billing-billing-country').val(jQuery('#edit-panes-delivery-delivery-country').val());
+});
+jQuery('#edit-panes-delivery-delivery-phone').blur(function(){
+	jQuery('#edit-panes-billing-billing-phone').val(jQuery('#edit-panes-delivery-delivery-phone').val());
+});
 /*if(window.location.href.indexOf('recurrence') > -1){
 	setTimeout(function(){
 		console.log('Se recarga'); 

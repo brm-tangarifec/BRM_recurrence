@@ -30,7 +30,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
 <script type="text/javascript" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></script> <noscript> <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></iframe> </noscript>
 <div class="row">
-	<form action="/cart/recurrence/checkout" class="uc-cart-checkout-form" method="POST">
+	<form action="/cart/recurrence/checkout-recurrence" class="uc-cart-checkout-form" method="POST">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>
@@ -84,13 +84,13 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				</div>
 				<div id="uc-store-address-delivery-zone-wrapper"><div class="form-item form-type-select form-item-panes-delivery-delivery-zone">
 				  <label for="edit-panes-delivery-delivery-zone"><span class="form-required" title="Este campo es obligatorio.">*</span> Departamento </label>
-				 <select id="edit-panes-delivery-delivery-zone" name="panes[delivery][delivery_zone]" class="form-select"><option value="0" selected="selected">- Seleccionar -</option><option value="Bogotá D.C">Distrito Capital de Bogota</option></select>
+				 <select id="edit-panes-delivery-delivery-zone" name="panes[delivery][delivery_zone]" class="form-select"><option value="0" selected="selected">- Seleccionar -</option><option value="92">Distrito Capital de Bogota</option></select>
 				</div></div>
 				<div class="clearfix"></div>
 				<div class="form-item form-item-panes-delivery-delivery-city form-type-select">
 				  <label for="edit-panes-delivery-delivery-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
-				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option>
-				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="92" size="32" maxlength="128" class="form-text hidden">
+				 <select class="ciudadS form-select form-type-select" id="ciudadS"><option val="">--Seleccionar--</option>
+				 	<option val="Bogotá">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="Bogotá" size="32" maxlength="128" class="form-text hidden">
 				</div>
 				<div class="form-item form-type-select form-item-panes-delivery-delivery-country">
 				  <label for="edit-panes-delivery-delivery-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
@@ -112,7 +112,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 		</div>
 		<!-- Panel que se muestra cuando la información de facturación es diferente -->
-		<div id="billing-address-pane"><div></div><div class="uc-store-address-field form-wrapper" id="edit-panes-billing-address--2"><div class="form-item form-type-textfield form-item-panes-billing-billing-first-name">
+		<div id="billing-address-pane"><div></div><div class="uc-store-address-field form-wrapper hidden" id="edit-panes-billing-address--2"><div class="form-item form-type-textfield form-item-panes-billing-billing-first-name">
 		  <label for="edit-panes-billing-billing-first-name"><span class="form-required" title="Este campo es obligatorio.">*</span> Nombre </label>
 		 <input type="text" id="edit-panes-billing-billing-first-name" name="panes[billing][billing_first_name]" value="" size="32" maxlength="128" class="form-text">
 		</div>
@@ -130,7 +130,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		</div><div class="clearfix"></div>
 		</div><div class="form-item form-item-panes-billing-billing-city form-type-select">
 		  <label for="edit-panes-billing-billing-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
-		 <select class="ciudadSE form-select form-type-select" id="ciudadSE" disabled="disabled"><option val="">--Seleccionar--</option></select><input type="text" id="edit-panes-billing-billing-city" name="panes[billing][billing_city]" value="BOGOTA D.C." size="32" maxlength="128" class="form-text hidden">
+		 <select class="ciudadSE form-select form-type-select" id="ciudadSE"><option val="">--Seleccionar--</option></select><input type="text" id="edit-panes-billing-billing-city" name="panes[billing][billing_city]" value="BOGOTA D.C." size="32" maxlength="128" class="form-text hidden">
 		</div>
 		<div class="form-item form-type-select form-item-panes-billing-billing-country">
 		  <label for="edit-panes-billing-billing-country"><span class="form-required" title="Este campo es obligatorio.">*</span> País </label>
