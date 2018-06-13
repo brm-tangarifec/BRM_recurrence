@@ -1138,7 +1138,7 @@ function recurrencecheck(){
 	$variables['messagePonds'] = $responseMessage;
     return theme('feedback',$variables);
 
-	die();
+	//die();
 }
 
 function getDataToken($idBrmToken){
