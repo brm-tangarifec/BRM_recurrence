@@ -85,8 +85,9 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div id="uc-store-address-delivery-zone-wrapper"><div class="form-item form-type-select form-item-panes-delivery-delivery-zone">
 				  <label for="edit-panes-delivery-delivery-zone"><span class="form-required" title="Este campo es obligatorio.">*</span> Departamento </label>
 				 <select id="edit-panes-delivery-delivery-zone" name="panes[delivery][delivery_zone]" class="form-select"><option value="0" selected="selected">- Seleccionar -</option><option value="Bogotá D.C">Distrito Capital de Bogota</option></select>
-				</div><div class="clearfix"></div>
-				</div><div class="form-item form-item-panes-delivery-delivery-city form-type-select">
+				</div></div>
+				<div class="clearfix"></div>
+				<div class="form-item form-item-panes-delivery-delivery-city form-type-select">
 				  <label for="edit-panes-delivery-delivery-city"><span class="form-required" title="Este campo es obligatorio.">*</span> Ciudad </label>
 				 <select class="ciudadS form-select form-type-select" id="ciudadS" disabled="disabled"><option val="">--Seleccionar--</option>
 				 	<option val="92">Bogotá</option></select><input type="text" id="edit-panes-delivery-delivery-city" name="panes[delivery][delivery_city]" value="" size="32" maxlength="128" class="form-text hidden" readonly="readonly">
