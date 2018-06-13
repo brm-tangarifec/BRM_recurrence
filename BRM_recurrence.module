@@ -1010,7 +1010,7 @@ function updateActiveRecurrenceByOrden($order_id){
 }
 
 function recurrencecheck(){
-	drupal_add_css(drupal_get_path('module', 'BRM_recurrence') .'/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false));
+	drupal_add_css(drupal_get_path('module', 'BRM_recurrence') .'/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false,'weight'=>9));
 	$varPost=filter_input_array(INPUT_POST);
 	global $user;
 	//printVar($user);
