@@ -28,7 +28,12 @@
 	width: 100%;
 }
 
+#delivery-address-pane .form-item-panes-delivery-delivery-phone,
 
+#delivery-address-pane .uc-store-address-field .form-item{
+	margin-top: 10px auto !important;
+
+}
 
 #recurrencia .form-fecha-tc.form-item input:focus{
 	border-color:#20b7c8;
