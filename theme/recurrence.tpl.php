@@ -25,12 +25,13 @@ if($subtotal==0){
  //función para calcular el costo del envío
  //printVar($orderRecurrence->order_id,'Se consulta');
 $envio=shippingRecurrence($variables['idKits'],$subtotal);
+$descuento=getCuponFromOrder($orderRecurrence->order_id);
 //Se agrega el Valor del envío a la orden
 updateLineShipping($orderRecurrence->order_id,$envio);
 ?>
 <script type="text/javascript" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></script> <noscript> <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></iframe> </noscript>
 <div class="row">
-	<form action="/cart/recurrence/checkout-recurrence" class="uc-cart-checkout-form" method="POST">
+	<form action="/cart/recurrence/checkout-recurrence" class="uc-cart-checkout-form" method="POST" name='recurrenceForm' id="recurrenceForm">
 
 		<fieldset class="form-wrapper">
 			<legend >Resumen de Canasta</legend>
@@ -162,12 +163,12 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					  $getCard=getDataTokerPerUser($userR->uid);
 					  //printVar($getCard);
 					  foreach ($getCard as $key => $card) {
-					  	//printVar($card);
+					  	printVar($card);
 					  	$franquicia=$card['franchise'];
 					  	$carMask=substr($card['card_mask'],-4);
 					  	?>
 					  	<div class="panel panel-default">
-					    <div class="panel-heading" role="tab" id="heading<?php print($key);?>">
+					    <div class="panel-heading tarjetaR" role="tab" id="heading<?php print($card['reference']);?>" data-reference="<?php print($card['reference']);?>">
 					      <h4 class="panel-title">
 					        <a class="collapsed">
 					          <img src="<?php print(base_path().path_to_theme());?>/images/tarjetas/<?php print(strtolower($franquicia))?>.jpg" alt="Visa">
@@ -179,6 +180,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					  </div>
 					  <?php }  ?>
 					  <!--Hasta acá-->
+					  <input type="hidden" name="reference-c" id="reference-c" value="">
 					</div>
 					<!--/- Acordeon tarjetas -->
 				</div>
@@ -186,7 +188,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 			</div>
 
 			<div class="clearfix"></div>
-
+			<div class="datoshabiente">
 			<h3 class="text-center">
 				Agrega una nueva Frecuencia de Pago
 			</h3 class="center">
@@ -233,7 +235,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div class="clearfix"></div>
 
 			</div>
-
+		</div>
 
 		</fieldset>
 		<!--/- Frecuencia -->
@@ -241,10 +243,10 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		<!-- Cupon -->
 		<fieldset class="form-wrapper" id="coupon-pane"><legend><span class="fieldset-legend">Cupón de descuento</span></legend><div class="fieldset-wrapper"><div class="fieldset-description">Ingrese un cupón para este pedido</div><div class="form-item form-type-textfield form-item-panes-coupon-code">
 		  <label for="edit-panes-coupon-code">Código del cupón  </label>
-		 <input type="text" id="edit-panes-coupon-code" name="panes[coupon][code]" value="" size="25" maxlength="128" class="form-text">
-		<div class="description">Ingresa un código de cupón y haz clic en "Aplicar al pedido" a continuación.</div>
+		 <input type="text" id="cuponUser" name="cuponUser" value="" size="25" maxlength="128" class="form-text">
+		<div class="description"><span class="titleCoupon"></span><span class="messageCoupon">Ingresa un código de cupón y haz clic en "Aplicar al pedido" a continuación.</span></div>
 		</div>
-		<input type="submit" id="edit-panes-coupon-apply" name="uc-coupon-apply" value="Aplicar al pedido" class="form-submit ajax-processed"><div id="coupon-messages"></div></div></fieldset>
+		<input type="button" id="aplicacupon" name="aplicacupon" value="Aplicar al pedido" class="addcouponcustom"><div id="coupon-messages"></div></div></fieldset>
 		<!--/- Cupon -->
 
 		<!-- Costo de envio -->
@@ -263,7 +265,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		<!--/- Costo de envio -->
 
 		<!-- Metodo de pago -->
-		<fieldset class="form-wrapper" id="payment-pane"><legend><span class="fieldset-legend">Método de pago</span></legend><div class="fieldset-wrapper"><div id="line-items-div"><table id="uc-order-total-preview" class="modificadaj"><tbody><tr class="line-item-subtotal"><td class="title">Subtotal:</td> <td class="price"><span class="uc-price" id="subtotalPrice2"><?php print(uc_currency_format($subtotal)); ?></span></td></tr><tr class="line-item-tax"><td class="title"><?php print($taxTitle); ?>:</td><td class="price"><span class="uc-price"><?php  print(uc_currency_format($ivamout)); ?></span></td></tr><tr class="line-item-total"><td class="title">Total productos:</td><td class="price"><span class="uc-price"><?php $totalSinEnvio=(float)$subtotal+(float)$ivamout; print(uc_currency_format($totalSinEnvio))?></span></td></tr><tr><td class="title">Envío:</td><td class="price"><span class="uc-price"><?php print(uc_currency_format($envio));?></span></td></tr><tr><td class="title">Total:</td><td class="price"><span class="uc-price"><?php print(uc_currency_format($orderRecurrence->order_total)); ?></span></td></tr></tbody></table></div><div class="form-item form-type-radios form-item-panes-payment-payment-method form-disabled">
+		<fieldset class="form-wrapper" id="payment-pane"><legend><span class="fieldset-legend">Método de pago</span></legend><div class="fieldset-wrapper"><div id="line-items-div"><table id="uc-order-total-preview" class="modificadaj"><tbody><tr class="line-item-subtotal"><td class="title">Subtotal:</td> <td class="price"><span class="uc-price" id="subtotalPrice2"><?php print(uc_currency_format($subtotal)); ?></span></td></tr><tr class="line-item-tax"><td class="title"><?php print($taxTitle); ?>:</td><td class="price"><span class="uc-price"><?php  print(uc_currency_format($ivamout)); ?></span></td></tr><tr class="line-item-total"><td class="title">Total productos:</td><td class="price"><span class="uc-price"><?php $totalSinEnvio=(float)$subtotal+(float)$ivamout; print(uc_currency_format($totalSinEnvio))?></span></td></tr><tr><td class="title">Envío:</td><td class="price"><span class="uc-price"><?php print(uc_currency_format($envio));?></span></td></tr><tr><td class="title">Cupón:</td><td class="price"><span class="uc-price descuentoCupon"><?php print(uc_currency_format($descuento));?></span></td></tr><tr><td class="title">Total:</td><td class="price"><span class="uc-price"><?php print(uc_currency_format($orderRecurrence->order_total)); ?></span></td></tr></tbody></table></div><div class="form-item form-type-radios form-item-panes-payment-payment-method form-disabled">
 		  <label class="element-invisible" for="edit-panes-payment-payment-method">Método de pago <span class="form-required" title="Este campo es obligatorio.">*</span></label>
 		 <div id="edit-panes-payment-payment-method" class="form-radios"><div class="form-item form-type-radio form-item-panes-payment-payment-method form-disabled active">
 		 <input disabled="disabled" type="radio" id="edit-panes-payment-payment-method-payulatam" name="panes[payment][payment_method]" value="payulatam" checked="checked" class="form-radio ajax-processed">  <label class="option" for="edit-panes-payment-payment-method-payulatam"><img src="/sites/all/modules/uc_payulatam/img/logopayulatam.png" alt="PayU Latam"> </label>
@@ -276,7 +278,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		<input type="hidden" name="form_build_id" value="form-N0ZAGGLc18xkBOWEFGAEeYF-glgZKQ1QwnCl-v_2ttU">
 		<input type="hidden" name="form_token" value="F5TaOhXZOyJIj406CDF3oLi0IlvqijKfO2KeWG1KJeM">
 		<input type="hidden" name="form_id" value="uc_cart_checkout_form">
-		<div class="form-actions form-wrapper" id="edit-actions"><input type="submit" id="edit-cancel" name="op" value="Cancelar" class="form-submit"><input type="button" id="edit-continue" name="op" value="Ver orden" class="form-submit" onclick="validCheckout(this);" style="background-color: rgb(27, 158, 173); color: white; text-transform: uppercase; padding: 10px 20px; border-radius: 6px;"></div>
+		<div class="form-actions form-wrapper" id="edit-actions"><input type="submit" id="edit-cancel" name="op" value="Cancelar" class="form-submit"><input type="submit" id="edit-continue" name="op" value="Ver orden" class="form-submit" style="background-color: rgb(27, 158, 173); color: white; text-transform: uppercase; padding: 10px 20px; border-radius: 6px;"></div>
 
 
 

@@ -88,6 +88,10 @@ function BRM_recurrence_schema() {
           'length'    => 80,
           'not null'  => TRUE
         ),
+        'deferred' =>array(
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
         'active' => array(
         'type' => 'varchar',
         'length' => 1,

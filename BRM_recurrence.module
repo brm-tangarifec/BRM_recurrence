@@ -58,6 +58,12 @@ function BRM_recurrence_menu() {
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
     ),
+    'cart/recurrence/addCoupon'=> array(
+  	'page callback' => 'addCouponCustom',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -1013,23 +1019,13 @@ function recurrencecheck(){
 	drupal_add_css(drupal_get_path('module', 'BRM_recurrence') .'/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false,'weight'=>9));
 	$varPost=filter_input_array(INPUT_POST);
 	global $user;
-	//printVar($user);
 	$params=array();
-	//datsos para creación de token
-	$params['nombre']=$varPost['tarjetahabiente'];
-	$params['cedula']=$varPost['cedulahabiente'];
-	$params['numtc']=$varPost['numtc'];
-	$params['expiration']=$varPost['aaaa'].'/'.$varPost['mm'];
-	$params['franquicia']=$varPost['franquicia'];
-	$params['cosec']=$varPost['cosec'];
-	$params["cuotas"]=$varPost['cuotas'];
-
-
+	//die();
 	//Datos para la orden
 	$params['PAYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
 	$params['PAYER_EMAIL']=$user->mail;
 	$params['PAYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
-	$params['PAYER_DNI']=$varPost['cedulahabiente'];
+	
 	$params['PAYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));
 	$params['PAYER_STREET_2']='';
 	$params['PAYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
@@ -1040,7 +1036,6 @@ function recurrencecheck(){
 	$params['BUYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
 	$params['BUYER_EMAIL']=$user->mail;
 	$params['BUYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
-	$params['BUYER_DNI']=$varPost['cedulahabiente'];
 	$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));;
 	$params['BUYER_STREET_2']='';
 	$params['BUYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
@@ -1051,7 +1046,6 @@ function recurrencecheck(){
 		$params['BUYER_NAME']=$varPost['panes']['billing']['billing_first_name'].' '.$varPost['panes']['billing']['billing_last_name'];
 		$params['BUYER_EMAIL']=$user->mail;
 		$params['BUYER_CONTACT_PHONE']=$varPost['panes']['billing']['billing_phone'];
-		$params['PAYER_DNI']=$varPost['cedulahabiente'];
 		$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['billing']['billing_street1']));
 		$params['BUYER_STREET_2']='';
 		$params['BUYER_CITY']=$varPost['panes']['billing']['billing_city'];
@@ -1094,10 +1088,12 @@ function recurrencecheck(){
 			$orderC->billing_zone=$varPost['panes']['billing']['billing_zone'];
 		}
 		$orderC->payment_method = 'payulatam';
-		$cuponActive='';
-		$dataUns['coupons']='';
-		$dataUns=serialize($dataUns);
-		$orderC->data=$dataUns;
+		if(empty($orderC->data)){
+			$cuponActive='';
+			$dataUns['coupons']='';
+			$dataUns=serialize($dataUns);
+			$orderC->data=$dataUns;
+		}
 		//se envia la orden
 		$params['orderId']=$order_id;
 		//Se guarda la orden
@@ -1106,10 +1102,43 @@ function recurrencecheck(){
 
 		$params['value']=$orderC->order_total;
 
+			//datsos para creación de token
+	if(!isset($varPost['reference-c']) && $varPost['reference-c']!=''){
+		$params['nombre']=$varPost['tarjetahabiente'];
+		$params['cedula']=$varPost['cedulahabiente'];
+		$params['PAYER_DNI']=$varPost['cedulahabiente'];
+		$params['numtc']=$varPost['numtc'];
+		$params['expiration']=$varPost['aaaa'].'/'.$varPost['mm'];
+		$params['franquicia']=$varPost['franquicia'];
+		$params['cosec']=$varPost['cosec'];
+		$params["cuotas"]=$varPost['cuotas'];
+
 		//función para creación del token y cobro de payú
 		$tokenJson=validDataFormPayU($params);
+	}else{
+		$tokenData=getDataTokenRecurrence($varPost['reference-c']);
+		$date=date('Y-m-d',$tokenData);
+		$dataTokenPayu=payuExistToken($tokenData['token'],$tokenData['user_id'],$date);
+		//printVar($tokenData,'Envia');
+		//printVar($dataTokenPayu,'Envia');
+		if($dataTokenPayu->code=='SUCCESS'){
+			$params['nombre']=$dataTokenPayu->creditCardTokenList[0]->name;
+			$params['cedula']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
+			$params['PAYER_DNI']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
+			$params['franquicia']=$dataTokenPayu->creditCardTokenList[0]->paymentMethod;
+			$params["cuotas"]=$tokenData['deferred'];
 
-		printVar($tokenJson,'HOla Json');
+			$tokenJson=validDataFormPayU($params,$varPost['reference-c']);
+
+			//printVar($tokenJson);
+
+			//die();
+		}
+	}
+
+	//die();
+
+		//printVar($tokenJson,'HOla Json');
 		//actualiza el token
 		if($tokenJson->transactionResponse->state=='APPROVED'){
 			$watchdog_variables = array(
@@ -1141,20 +1170,23 @@ function recurrencecheck(){
 	//die();
 }
 
-function getDataToken($idBrmToken){
+function getDataTokenRecurrence($idBrmToken){
 	$datax=array();
 	$query=db_select('brm_recurrence_token','bt');
-	$result=$query->fields('br',array('user_id','card_mask','token','franchise','active'))
+	$result=$query->fields('bt',array('user_id','card_mask','token','franchise','active','date','deferred'))
 	->condition('bt.active','S','=')
 	->condition('bt.id',$idBrmToken,'=')
 	->execute();
 
 	$datap=0;
 	while ($record=$result->fetchAssoc()) {
-		$datax[$datap]['user_id']=$record['user_id'];
-		$datax[$datap]['card_mask']=$record['card_mask'];
-		$datax[$datap]['token']=$record['token'];
-		$datax[$datap]['franchise']=$record['franchise'];
+		//printVar($record);
+		$datax['user_id']=$record['user_id'];
+		$datax['card_mask']=$record['card_mask'];
+		$datax['token']=$record['token'];
+		$datax['franchise']=$record['franchise'];
+		$datax['date']=$record['date'];
+		$datax['deferred']=$record['deferred'];
 		$datap++;
 	}
 
@@ -1165,16 +1197,100 @@ function getDataToken($idBrmToken){
 function getDataTokerPerUser($userId){
 	$datax=array();
 	$query=db_select('brm_recurrence_token','brt');
-	$result=$query->fields('brt',array('card_mask','franchise'))
+	$result=$query->fields('brt',array('id','card_mask','franchise'))
 		->condition('brt.user_id',$userId,'=')
 		->condition('brt.active','S','=')
 		->execute();
 	$datap=0;
 	while ($record=$result->fetchAssoc()) {
 		//printVar($record);
+		$datax[$datap]['reference']=$record['id'];
 		$datax[$datap]['card_mask']=$record['card_mask'];
 		$datax[$datap]['franchise']=$record['franchise'];
 		$datap++;
 	}
 	return $datax;
+}
+//función para agregar un cupon
+function addCouponCustom(){
+	$varPost=filter_input_array(INPUT_POST);
+	global $user;
+		//printVar($varPost);
+		//die();
+	if($varPost['vartC']=='addcp'){
+		$codde=$varPost['consul'];
+		//uc_coupon_session_add($codde,'submit');
+		$order=getLastOrderUser($user->uid);
+		$addCoupon=uc_coupon_validate($codde);
+		$message='';
+		$title='';
+		if($addCoupon->valid==1){
+			$title=$addCoupon->title;
+			$message=$addCoupon->message;
+			$desc=$addCoupon->pretax_amount;
+			addCouponToOrderCustom($addCoupon,$order['order_id']);
+		}else{
+			$title=$addCoupon->title;
+			$message=$addCoupon->message;
+			$desc=0;
+		}
+		$datosCupon=array('title'=>$title,'mensaje'=>$message,'descuento'=>'-'.uc_currency_format($desc));
+		drupal_json_output($datosCupon);
+		//printVar($addCoupon,'Respuesta cupon');
+		//printVar($message,'Mensaje');
+	}else{
+		drupal_goto();
+	}
+	
+
+}
+
+//Función para agregar el cupon a la orden
+function addCouponToOrderCustom($cupon,$order_id){
+	//printVar($cupon,$order_id);
+		$orderC=uc_order_load($order_id);
+		$dataUns['coupons']=array($cupon->code=>$cupon->discounts);
+		$dataUns=serialize($dataUns);
+		//printVar($dataUns,'serialize');
+		$orderC->data=$dataUns;
+		//die()
+		$query=db_select('uc_order_line_items','ul');
+		$result=$query->fields('ul',array('line_item_id'))
+		->condition('ul.order_id',$order_id,'=')
+		->condition('ul.type','coupon','=')
+		//->condition('type','tax','!=')
+		->execute();
+		$record=$result->fetchAssoc();
+		if(empty($record)){
+			$dataLine['code']=$cupon->code;
+			$dataLineS=serialize($dataLine);
+			//printVar($dataLineS,'Muestra');
+			uc_order_line_item_add($order_id,'coupon',$cupon->title,'-'.$cupon->pretax_amount,0,$dataLineS);
+		}
+
+		$return = db_insert('uc_coupons_orders')
+		->fields(array(
+		'cid' => $cupon->cid,
+		'oid' => $order_id,
+		'value' => $cupon->value,
+		'code' => $cupon->code,
+		))->execute();
+		uc_order_save($orderC);
+}
+
+//función para obtener el descuento aplicado
+function getCuponFromOrder($order_id){
+		$query=db_select('uc_order_line_items','ul');
+		$result=$query->fields('ul',array('amount'))
+		->condition('ul.order_id',$order_id,'=')
+		->condition('ul.type','coupon','=')
+		//->condition('type','tax','!=')
+		->execute();
+		$record=$result->fetchAssoc();
+		if(!empty($record)){
+			$descuento=$record['amount'];
+		}else{
+			$descuento=0;
+		}
+		return $descuento;
 }

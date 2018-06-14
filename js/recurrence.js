@@ -94,6 +94,43 @@ jQuery('#numtc').blur(function(r){
 		});
 	}
 });
+jQuery('.addcouponcustom').click(function(r){
+	//console.log('Hola le di click');
+	r.preventDefault();
+	var coupon=jQuery('#cuponUser').val();
+	if(coupon!=''){
+		console.log(coupon);
+		jQuery.ajax({
+		type: "POST",
+		url: "/cart/recurrence/addCoupon",
+		data:{
+		  consul:coupon,
+		  vartC: 'addcp' 
+		},
+
+			success: function(data){
+			  console.log(data);
+			  if(data.title!='Desconocido'){
+			  	jQuery('.titleCoupon').text(data.title);
+			  	jQuery('#cuponUser').hide();
+			  }
+			  if(data.descuento!=0){
+			  	jQuery('.descuentoCupon').text('');
+			  	jQuery('.descuentoCupon').text(data.descuento);
+			  }
+			  jQuery('.messageCoupon').html(data.mensaje);
+			}
+		});
+	}
+});
+//Se activan la tarjeta registrada
+jQuery('.tarjetaR').click(function(l){
+	l.preventDefault();
+	var tActive=jQuery(this).attr('data-reference');
+	console.log(tActive);
+	jQuery('#reference-c').val(tActive);
+	jQuery('.datoshabiente').addClass('hidden');
+});
 
 //Pasar datos si está deschekeado mi direccion de facturación es la misma
 jQuery('#edit-panes-billing-copy-address').change(function(){
