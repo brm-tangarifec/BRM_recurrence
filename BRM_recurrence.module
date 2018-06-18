@@ -260,7 +260,7 @@ function recurrenceTest(){
 				      //sleep(5);
 				      $orderC=uc_order_load($orderC->order_id);
 				      $params=array();
-				      //die();
+				      
 				      //Datos para la orden
 						$params['PAYER_NAME']=$orderLoad->delivery_first_name.' '.$orderLoad->delivery_last_name;
 						$params['PAYER_EMAIL']=$orderLoad->primary_email;
@@ -283,7 +283,6 @@ function recurrenceTest(){
 
 						$params['value']=$orderC->order_total;
 						$dataToken=getDataTokenByOrder($orderLoad->order_id);
-						//printVar($dataToken['idToken'],'El token');
 							//datsos para creación de token
 
 						$tokenData=getDataTokenRecurrence($dataToken['idToken']);
@@ -294,10 +293,14 @@ function recurrenceTest(){
 							$params['cedula']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
 							$params['PAYER_DNI']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
 							$params['franquicia']=$dataTokenPayu->creditCardTokenList[0]->paymentMethod;
-							$params["cuotas"]=$tokenData['deferred'];
+							$params["cuotas"]=$dataToken['cuotas'];
+
+							printVar($params,'Envia');
+
 
 							$tokenJson=validDataFormPayU($params,$dataToken['idToken']);
 						}
+
 						if($tokenJson->transactionResponse->state=='APPROVED'){
 							$watchdog_variables = array(
 								'!order_id' => $orderC->order_id,
@@ -527,6 +530,7 @@ function saveRecurrenceByProduct($order_id,$kitId,$productId,$drecurrence,$creat
 			'id_brm_recurrence_token' => 1000000,
 			'recurrence_days' =>$drecurrence,
 			'active' =>'n',
+			'deferred' =>1,
 			'created'=>$createDate,
 			'modificate'=>$createDate,
 		))->execute();
@@ -681,7 +685,7 @@ function custonOrderCreate(){
 							$params['cedula']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
 							$params['PAYER_DNI']=$dataTokenPayu->creditCardTokenList[0]->identificationNumber;
 							$params['franquicia']=$dataTokenPayu->creditCardTokenList[0]->paymentMethod;
-							$params["cuotas"]=$tokenData['deferred'];
+							$params["cuotas"]=$dataToken['cuotas'];
 
 							$tokenJson=validDataFormPayU($params,$dataToken['idToken']);
 						}
@@ -767,9 +771,10 @@ function getProducDataByOrder($order_id){
 }
 
 //función para actualizar el token y estado de la orden recurrente
-function updateRecurrenceByOrden($order_id,$tokenId){
+function updateRecurrenceByOrden($order_id,$tokenId,$cuotas){
 	db_update('brm_recurrence')->fields(array(
     "id_brm_recurrence_token"=>$tokenId,
+    "deferred"=> $cuotas,
     "modificate"=> date('Y-m-d H:i:s'),
     ))
    ->condition('order_id', $order_id)
@@ -1262,8 +1267,7 @@ function recurrencecheck(){
 	$order_id = $orderActive['order_id'];
 	//Se carga el iva
 	$orderC = uc_order_load($order_id);
-	//printVar($orderC);
-	//die();
+
 	if($orderC->order_status=='in_checkout'){
 		$orderC->delivery_first_name=$varPost['panes']['delivery']['delivery_first_name'];
 		$orderC->delivery_last_name=$varPost['panes']['delivery']['delivery_last_name'];
@@ -1303,7 +1307,10 @@ function recurrencecheck(){
 		$params['value']=$orderC->order_total;
 
 			//datsos para creación de token
-	if(!isset($varPost['reference-c']) && $varPost['reference-c']!=''){
+
+
+
+	if(isset($varPost['reference-c']) && $varPost['reference-c']==''){
 		$params['nombre']=$varPost['tarjetahabiente'];
 		$params['cedula']=$varPost['cedulahabiente'];
 		$params['PAYER_DNI']=$varPost['cedulahabiente'];
@@ -1314,12 +1321,13 @@ function recurrencecheck(){
 		$params["cuotas"]=$varPost['cuotas'];
 
 		//función para creación del token y cobro de payú
+	
 		$tokenJson=validDataFormPayU($params);
 	}else{
 		$tokenData=getDataTokenRecurrence($varPost['reference-c']);
 		$date=date('Y-m-d',$tokenData);
 		$dataTokenPayu=payuExistToken($tokenData['token'],$tokenData['user_id'],$date);
-		//printVar($tokenData,'Envia');
+		printVar($tokenData,'Envia');
 		//printVar($dataTokenPayu,'Envia');
 		if($dataTokenPayu->code=='SUCCESS'){
 			$params['nombre']=$dataTokenPayu->creditCardTokenList[0]->name;
@@ -1329,10 +1337,6 @@ function recurrencecheck(){
 			$params["cuotas"]=$tokenData['deferred'];
 
 			$tokenJson=validDataFormPayU($params,$varPost['reference-c']);
-
-			//printVar($tokenJson);
-
-			//die();
 		}
 	}
 	if($tokenJson->transactionResponse->state=='APPROVED'){
@@ -1368,7 +1372,7 @@ function recurrencecheck(){
 function getDataTokenRecurrence($idBrmToken){
 	$datax=array();
 	$query=db_select('brm_recurrence_token','bt');
-	$result=$query->fields('bt',array('user_id','card_mask','token','franchise','active','date','deferred'))
+	$result=$query->fields('bt',array('user_id','card_mask','token','franchise','active','date'))
 	->condition('bt.active','S','=')
 	->condition('bt.id',$idBrmToken,'=')
 	->execute();
@@ -1381,7 +1385,6 @@ function getDataTokenRecurrence($idBrmToken){
 		$datax['token']=$record['token'];
 		$datax['franchise']=$record['franchise'];
 		$datax['date']=$record['date'];
-		$datax['deferred']=$record['deferred'];
 		$datap++;
 	}
 
@@ -1503,7 +1506,7 @@ function getDataTokenByOrder($order_id){
 	$datax=array();
 	$arrayRevolt=array();
 	$query=db_select('brm_recurrence','brr');
-	$result=$query->fields('brr',array('id','order_id','id_brm_recurrence_token','kit_id','recurrence_days'))
+	$result=$query->fields('brr',array('id','order_id','id_brm_recurrence_token','kit_id','recurrence_days','deferred'))
 	->condition('brr.order_id',$order_id,'=')
 	->condition('brr.active','y','=')
 	->execute();
@@ -1513,6 +1516,7 @@ function getDataTokenByOrder($order_id){
 		$datax['kitId']=$rescord['kit_id'];
 		$datax['recurrence']=$rescord['recurrence_days'];
 		$datax['idToken']=$rescord['id_brm_recurrence_token'];
+		$datax['cuotas']=$rescord['deferred'];
 	}
 
 	$unico=array_unique($datax);
