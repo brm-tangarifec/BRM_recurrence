@@ -1,0 +1,80 @@
+/*recurrencia.css*/
+.row-rec, .row-rec p{
+	font-size: 1.4rem !important;
+}
+#recurrencia .form-item input{
+	background: #f2f2f2 ;
+	border: 1px solid #fff;
+	padding: 10px;
+	transition: all ease-in-out .3s;
+	-webkit-transition: all ease-in-out .3s;
+	-moz-transition: all ease-in-out .3s;
+	-ms-transition: all ease-in-out .3s;
+	-o-transition: all ease-in-out .3s;
+	width: 100%;
+}
+
+#recurrencia .form-item label small{
+	font-size: 55%;
+}
+
+
+
+
+#recurrencia .form-fecha-tc.form-item .form-tc{
+	float:left;
+	margin:0 0.1rem;
+	max-width: 49%;
+	width: 100%;
+}
+
+#delivery-address-pane .form-item-panes-delivery-delivery-phone,
+#delivery-address-pane .uc-store-address-field .form-item{
+	margin: 10px auto !important;
+
+}
+
+#recurrencia .form-fecha-tc.form-item input:focus{
+	border-color:#20b7c8;
+}
+#recurrencia .form-fecha-tc.form-item input::-webkit-input-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input::-moz-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input:-ms-input-placeholder{
+	color:black;
+}
+#recurrencia .form-fecha-tc.form-item input:-moz-placeholder{
+	color:black;
+}
+
+.btn-recurrence{
+	display: block;
+	margin: 1rem auto !important;
+}
+
+.text-title-recurrence{
+	color:#20b7c8;
+	font-size: 2.5rem;
+	margin:16rem auto 1rem !important;
+}
+
+.badge{
+	background-color: black;
+	border-radius: 10px;
+	color:white;
+	font-size: 1rem;
+	margin:0 auto;
+	padding:0.5rem 1rem;
+	text-align: center;
+}
+
+@media (min-width: 768px){
+	#recurrencia .push-half{
+		margin-left: 25%
+	}
+
+}
+

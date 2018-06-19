@@ -178,14 +178,22 @@ function recurrenceTest(){
 			$RecurrerORder=getOrdersByTime($recurrencia[$i]);
 			if(!empty($RecurrerORder)){
 				//printVar($RecurrerORder,'Recurrente');
+				/*foreach ($RecurrerORder as $key => $value) {
+					printVar($key,'Key');
+					printVar($value,'Valor');
+					$orderLoad=getOrderById($key);
+					printVar($orderLoad);
+				}*/
+				//printVar($RecurrerORder);
 				foreach ($RecurrerORder as $key => $value) {
+					echo"111";
 					//$dataOrder=getProducDataByOrder($key);
 					$orderLoad=getOrderById($key);
 					//Se obtiene la recurrencia por usuario
 					$orderActive=getLastOrderDataUser($orderLoad->uid);
 					//printVar($orderActive);
 				      // Create a new order if necessary.
-					//printVar($orderActive);
+					//printVar($orderActive,"orderActive");
 					if(!$orderActive){
 						$orderC = uc_order_new($orderLoad->uid,'in_checkout');
 						$order_id = $orderC->order_id;
@@ -196,7 +204,7 @@ function recurrenceTest(){
 					$orderC->order_status='in_recurrence';
 					recurrenceStatus($order_id);
 					
-				      //Se carga el iva
+				      /*Se carga el iva*/
 				      $taxC = uc_taxes_rate_load('4');
 				      //Se llama la orden completa
 				      //Se agregan datos a la orden
@@ -216,9 +224,9 @@ function recurrenceTest(){
 				      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
 				      	//printVar(lineItemsOrder($key),$key);
 					      $callShipping=lineItemsOrder($key);
-					      for ($i=0; $i < count($callShipping); $i++) { 
+					      for ($j=0; $j < count($callShipping); $j++) { 
 					      	//printVar($callShipping[$i]);
-					      	uc_order_line_item_add($order_id,$callShipping[$i]['type'],$callShipping[$i]['title'],$callShipping[$i]['amount'],$callShipping[$i]['weight'], $callShipping[$i]['data']);
+					      	uc_order_line_item_add($order_id,$callShipping[$j]['type'],$callShipping[$j]['title'],$callShipping[$j]['amount'],$callShipping[$j]['weight'], $callShipping[$j]['data']);
 					      }
 				      }
 
@@ -259,8 +267,7 @@ function recurrenceTest(){
 				      uc_order_save($orderC);
 				      //sleep(5);
 				      $orderC=uc_order_load($orderC->order_id);
-				      $params=array();
-				      
+				      $params=array();				      
 				      //Datos para la orden
 						$params['PAYER_NAME']=$orderLoad->delivery_first_name.' '.$orderLoad->delivery_last_name;
 						$params['PAYER_EMAIL']=$orderLoad->primary_email;
@@ -295,37 +302,38 @@ function recurrenceTest(){
 							$params['franquicia']=$dataTokenPayu->creditCardTokenList[0]->paymentMethod;
 							$params["cuotas"]=$dataToken['cuotas'];
 
-							printVar($params,'Envia');
+							//printVar($params,'Envia');
 
 
 							$tokenJson=validDataFormPayU($params,$dataToken['idToken']);
+							//printVar($tokenJson,"tokenJson");
+							if($tokenJson->transactionResponse->state=='APPROVED'){
+								$watchdog_variables = array(
+									'!order_id' => $orderC->order_id,
+									'!current_order_status' => $orderC->order_status,
+									'!reference_pol' => check_plain('1 Transacción aprobada'),
+								);
+								$comment = t("Order Completed.") . ' ' . t("PayU Latam # !reference_pol", $watchdog_variables);
+						       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
+						       	$plata = (int)$total;
+						       	$plata2 = (string)$plata;
+								//$orderC->order_status='payment_received';
+								uc_payment_enter($orderC->order_id, 'payulatam',$plata2, 0, NULL, $comment);
+								uc_order_update_status($orderC->order_id, 'payment_received');
+								updateActiveRecurrenceByOrden($orderC->order_id);
+								$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
+								BRM_invoice_create_number($orderC->order_id);
+							}elseif($tokenJson->transactionResponse->state=='DECLINED'){
+								//printVar($tokenJson->transactionResponse->responseMessage);
+								$comment = t("Order Declined.") . ' ' . t("PayU Latam # !reference_pol");
+						       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
+								uc_order_update_status($orderC->order_id, 'canceled');
+								$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
+							}
 						}
 
-						if($tokenJson->transactionResponse->state=='APPROVED'){
-							$watchdog_variables = array(
-								'!order_id' => $orderC->order_id,
-								'!current_order_status' => $orderC->order_status,
-								'!reference_pol' => check_plain('1 Transacción aprobada'),
-							);
-							$comment = t("Order Completed.") . ' ' . t("PayU Latam # !reference_pol", $watchdog_variables);
-					       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
-					       	$plata = (int)$total;
-					       	$plata2 = (string)$plata;
-							//$orderC->order_status='payment_received';
-							uc_payment_enter($orderC->order_id, 'payulatam',$plata2, 0, NULL, $comment);
-							uc_order_update_status($orderC->order_id, 'payment_received');
-							updateActiveRecurrenceByOrden($orderC->order_id);
-							$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
-							BRM_invoice_create_number($orderC->order_id);
-						}elseif($tokenJson->transactionResponse->state=='DECLINED'){
-							//printVar($tokenJson->transactionResponse->responseMessage);
-							$comment = t("Order Declined.") . ' ' . t("PayU Latam # !reference_pol");
-					       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
-							uc_order_update_status($orderC->order_id, 'canceled');
-							$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
-						}
 
-					updateDateFromRecurrence($dataToken['orderId']);
+					//updateDateFromRecurrence($dataToken['orderId']);
 				/*F agrega el cobro por token*/
 
 				//Cierra el foreach
@@ -335,14 +343,14 @@ function recurrenceTest(){
 			//Cierra el if
 		}
 		//Se baja la bandera al crear las ordenes
-		//bajarBandera();
+		bajarBandera();
 	
 	}
 
 
 
 
-
+die();
 
 /////////////////////////////////////////
 
@@ -560,7 +568,7 @@ function custonOrderCreate(){
 	//Función de prueba, migrar a la función que crea las ordenes
 	//Se comprueba que la bandera se encuentre arriba, para ejecutar
 	//subirBandera();
-		if(getBanderaRecurrence()=="S"){
+	if(getBanderaRecurrence()=="S"){
 		//Se estipulan los tiempos
 		$recurrencia=array('14','30','60','90','120');
 		//printVar(uc_order_load('1299'),'La orden');
@@ -569,14 +577,22 @@ function custonOrderCreate(){
 			$RecurrerORder=getOrdersByTime($recurrencia[$i]);
 			if(!empty($RecurrerORder)){
 				//printVar($RecurrerORder,'Recurrente');
+				/*foreach ($RecurrerORder as $key => $value) {
+					printVar($key,'Key');
+					printVar($value,'Valor');
+					$orderLoad=getOrderById($key);
+					printVar($orderLoad);
+				}*/
+				//printVar($RecurrerORder);
 				foreach ($RecurrerORder as $key => $value) {
+					echo"111";
 					//$dataOrder=getProducDataByOrder($key);
 					$orderLoad=getOrderById($key);
 					//Se obtiene la recurrencia por usuario
 					$orderActive=getLastOrderDataUser($orderLoad->uid);
 					//printVar($orderActive);
 				      // Create a new order if necessary.
-					//printVar($orderActive);
+					//printVar($orderActive,"orderActive");
 					if(!$orderActive){
 						$orderC = uc_order_new($orderLoad->uid,'in_checkout');
 						$order_id = $orderC->order_id;
@@ -587,7 +603,7 @@ function custonOrderCreate(){
 					$orderC->order_status='in_recurrence';
 					recurrenceStatus($order_id);
 					
-				      //Se carga el iva
+				      /*Se carga el iva*/
 				      $taxC = uc_taxes_rate_load('4');
 				      //Se llama la orden completa
 				      //Se agregan datos a la orden
@@ -607,9 +623,9 @@ function custonOrderCreate(){
 				      	uc_order_comment_save($order_id,$orderLoad->uid, $message, $type = 'admin', $status = 'Pending', $notify = FALSE);
 				      	//printVar(lineItemsOrder($key),$key);
 					      $callShipping=lineItemsOrder($key);
-					      for ($i=0; $i < count($callShipping); $i++) { 
+					      for ($j=0; $j < count($callShipping); $j++) { 
 					      	//printVar($callShipping[$i]);
-					      	uc_order_line_item_add($order_id,$callShipping[$i]['type'],$callShipping[$i]['title'],$callShipping[$i]['amount'],$callShipping[$i]['weight'], $callShipping[$i]['data']);
+					      	uc_order_line_item_add($order_id,$callShipping[$j]['type'],$callShipping[$j]['title'],$callShipping[$j]['amount'],$callShipping[$j]['weight'], $callShipping[$j]['data']);
 					      }
 				      }
 
@@ -650,8 +666,7 @@ function custonOrderCreate(){
 				      uc_order_save($orderC);
 				      //sleep(5);
 				      $orderC=uc_order_load($orderC->order_id);
-				      $params=array();
-				      //die();
+				      $params=array();				      
 				      //Datos para la orden
 						$params['PAYER_NAME']=$orderLoad->delivery_first_name.' '.$orderLoad->delivery_last_name;
 						$params['PAYER_EMAIL']=$orderLoad->primary_email;
@@ -674,7 +689,6 @@ function custonOrderCreate(){
 
 						$params['value']=$orderC->order_total;
 						$dataToken=getDataTokenByOrder($orderLoad->order_id);
-						//printVar($dataToken['idToken'],'El token');
 							//datsos para creación de token
 
 						$tokenData=getDataTokenRecurrence($dataToken['idToken']);
@@ -687,31 +701,36 @@ function custonOrderCreate(){
 							$params['franquicia']=$dataTokenPayu->creditCardTokenList[0]->paymentMethod;
 							$params["cuotas"]=$dataToken['cuotas'];
 
+							//printVar($params,'Envia');
+
+
 							$tokenJson=validDataFormPayU($params,$dataToken['idToken']);
+							//printVar($tokenJson,"tokenJson");
+							if($tokenJson->transactionResponse->state=='APPROVED'){
+								$watchdog_variables = array(
+									'!order_id' => $orderC->order_id,
+									'!current_order_status' => $orderC->order_status,
+									'!reference_pol' => check_plain('1 Transacción aprobada'),
+								);
+								$comment = t("Order Completed.") . ' ' . t("PayU Latam # !reference_pol", $watchdog_variables);
+						       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
+						       	$plata = (int)$total;
+						       	$plata2 = (string)$plata;
+								//$orderC->order_status='payment_received';
+								uc_payment_enter($orderC->order_id, 'payulatam',$plata2, 0, NULL, $comment);
+								uc_order_update_status($orderC->order_id, 'payment_received');
+								updateActiveRecurrenceByOrden($orderC->order_id);
+								$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
+								BRM_invoice_create_number($orderC->order_id);
+							}elseif($tokenJson->transactionResponse->state=='DECLINED'){
+								//printVar($tokenJson->transactionResponse->responseMessage);
+								$comment = t("Order Declined.") . ' ' . t("PayU Latam # !reference_pol");
+						       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
+								uc_order_update_status($orderC->order_id, 'canceled');
+								$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
+							}
 						}
-						if($tokenJson->transactionResponse->state=='APPROVED'){
-							$watchdog_variables = array(
-								'!order_id' => $orderC->order_id,
-								'!current_order_status' => $orderC->order_status,
-								'!reference_pol' => check_plain('1 Transacción aprobada'),
-							);
-							$comment = t("Order Completed.") . ' ' . t("PayU Latam # !reference_pol", $watchdog_variables);
-					       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
-					       	$plata = (int)$total;
-					       	$plata2 = (string)$plata;
-							//$orderC->order_status='payment_received';
-							uc_payment_enter($orderC->order_id, 'payulatam',$plata2, 0, NULL, $comment);
-							uc_order_update_status($orderC->order_id, 'payment_received');
-							updateActiveRecurrenceByOrden($orderC->order_id);
-							$responseMessage='Muchas gracias por comprar activar la suscripción a este KIT';
-							BRM_invoice_create_number($orderC->order_id);
-						}elseif($tokenJson->transactionResponse->state=='DECLINED'){
-							//printVar($tokenJson->transactionResponse->responseMessage);
-							$comment = t("Order Declined.") . ' ' . t("PayU Latam # !reference_pol");
-					       	uc_order_comment_save($orderC->order_id, 0, $comment, 'order');
-							uc_order_update_status($orderC->order_id, 'canceled');
-							$responseMessage='Lo sentimos no pudimos realizar el proceso de cobro';
-						}
+
 
 					updateDateFromRecurrence($dataToken['orderId']);
 				/*F agrega el cobro por token*/
@@ -724,11 +743,11 @@ function custonOrderCreate(){
 		}
 		//Se baja la bandera al crear las ordenes
 		bajarBandera();
-	
 	}
 }
 //función para obtener los productos por fecha
 function getOrdersByTime($time){
+	//printVar($time,'Tiempo');
 	//se hace el llamado a las ordenes dependiendo de la cantidad de tiempo
 	$datax=array();
 	$fechaRequest=date('Y-m-d');
@@ -742,6 +761,7 @@ function getOrdersByTime($time){
 	->execute();
 	
 	while($record=$result->fetchAssoc()){
+		//printVar($record);
 		$datax[]=$record;
 	}
 	$datar=array();

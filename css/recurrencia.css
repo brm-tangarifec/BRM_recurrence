@@ -1,80 +1,260 @@
 /*recurrencia.css*/
-.row-rec, .row-rec p{
-	font-size: 1.4rem !important;
-}
-#recurrencia .form-item input{
-	background: #f2f2f2 ;
-	border: 1px solid #fff;
-	padding: 10px;
-	transition: all ease-in-out .3s;
-	-webkit-transition: all ease-in-out .3s;
-	-moz-transition: all ease-in-out .3s;
-	-ms-transition: all ease-in-out .3s;
-	-o-transition: all ease-in-out .3s;
-	width: 100%;
+
+body p{
+	font-size: 1.6rem;
 }
 
-#recurrencia .form-item label small{
-	font-size: 55%;
+input, option{
+	font-size: 2rem;
 }
 
-
-
-
-#recurrencia .form-fecha-tc.form-item .form-tc{
-	float:left;
-	margin:0 0.1rem;
-	max-width: 49%;
-	width: 100%;
+legend{
+	border: none!important;
+	color:#20b7c8;
 }
 
-#delivery-address-pane .form-item-panes-delivery-delivery-phone,
-#delivery-address-pane .uc-store-address-field .form-item{
-	margin: 10px auto !important;
-
+label{
+	font-size: 2rem!important;
+	font-weight: 300!important;
+	letter-spacing: 0.1rem;
 }
 
-#recurrencia .form-fecha-tc.form-item input:focus{
-	border-color:#20b7c8;
+select{
+	border: 0;
 }
-#recurrencia .form-fecha-tc.form-item input::-webkit-input-placeholder{
-	color:black;
-}
-#recurrencia .form-fecha-tc.form-item input::-moz-placeholder{
-	color:black;
-}
-#recurrencia .form-fecha-tc.form-item input:-ms-input-placeholder{
-	color:black;
-}
-#recurrencia .form-fecha-tc.form-item input:-moz-placeholder{
-	color:black;
-}
+
+*:focus { outline: none; }
 
 .btn-recurrence{
-	display: block;
-	margin: 1rem auto !important;
+	display: inline-block;
+    background-color: #20b7c8;
+    border-radius: 5px;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    margin: 2rem auto !important;
+    padding: 1.3rem 1rem;
+    transition: all ease-in-out .3s;
+    vertical-align: bottom;
+    width: 51%;
+}
+
+.btn-recurrence:hover{
+	background-color: #1995a2; 
+}
+
+.btn-recurrence-dos{
+	display: inline-block;
+    background-color: #20b7c8;
+    border-radius: 5px;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    margin: 2rem 1rem;
+    padding: 1.3rem 1rem;
+    transition: all ease-in-out .3s;
+    vertical-align: bottom;
+    width: 42%;
+}
+
+.btn-recurrence-dos:hover{
+	background-color: #1995a2; 
+}
+
+.btn-active{
+    background-color: #1995a2;
+}
+
+.cont{
+	border-bottom: 1px solid #e5e5e5;
+	padding: 2rem 0;
+}
+
+.cont-btns{
+	padding: 0 0 3rem 0;
+}
+
+.cont p{
+	margin: 2rem 0; 
+}
+
+.cont-pago{
+	float: left;
+	position: relative;
+	width: 100%;
+}
+
+.cont-pasarela{
+	position: relative;
+    display: block;
+    float: left;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+.cont-pasarela label{
+    float: left;
+}
+
+.cont-pasarela img{
+	margin-left: 2rem;
+    display: block;
+    float: left;
+}
+
+.cont-select{
+	border: 1px solid #b0b0b0;
+	background-color: #f5f5f5;
+	padding: 0 0.5rem;
+}
+
+.cont-select-dir{
+	border: 1px solid #b0b0b0;
+	background-color: #ffffff;
+	padding: 0 0.5rem;
+}
+
+.cupon {
+    display: inline-block;
+    float: none;
+    margin: 2rem 3% 1.2rem;
+    text-align: left;
+    width: 55%;
+}
+
+.cupon input{
+	text-align: center;
+}
+
+.cupon input:focus{
+	border-color: #20b7c8;
+}
+
+.form-group {
+    float: left;
+    margin: 0.7rem 3%;
+    text-align: left;
+    width: 44%;
+}
+
+.form-group-select {
+    margin: 2rem 3%;
+    width: 94%;
+}
+
+.form-group input:focus{
+	border-color: #20b7c8;
+}
+
+.form-control-p{
+	background-color: #f5f5f5;
+    box-shadow:none;
+    height: 50px;
+    width: 100%;
+}
+
+select.form-control-p{
+	background-color: transparent;
+	height: 48px;
+}
+
+.form-control-select{
+	background: transparent;
+    height: 50px;
+    width: 100%;
+}
+
+.help-block{
+	font-size: 1.2rem;
+    margin: 0!important;
+}
+
+.iva{
+	background-color: #f2f2f2;
+}
+
+.table{
+	text-align: center;
+}
+
+.table>thead>tr>th{
+	text-align: center;
 }
 
 .text-title-recurrence{
 	color:#20b7c8;
 	font-size: 2.5rem;
-	margin:16rem auto 1rem !important;
-}
-
-.badge{
-	background-color: black;
-	border-radius: 10px;
-	color:white;
-	font-size: 1rem;
-	margin:0 auto;
-	padding:0.5rem 1rem;
+	margin: 2rem auto 2rem !important;
+	position: relative;
 	text-align: center;
+	text-transform: uppercase;
+    float: left;
 }
 
-@media (min-width: 768px){
-	#recurrencia .push-half{
-		margin-left: 25%
+.text-dest{
+	font-size: 2rem;
+	margin: 0!important;
+	text-align: left;
+}
+
+.checkbox, .radio{
+	display: inline-block!important;
+}
+
+.checkbox label, .radio label{
+	vertical-align: top;
+}
+
+.text-check{
+	display: inline-block;
+	font-size: 2rem;
+	width: 57%;
+}
+
+.text-check p{
+	margin: 0;
+}
+
+@media (max-width: 768px){
+	.btn-recurrence{
+		width: 85%;
+	}
+
+	.btn-recurrence-dos{
+		width: 90%;
+		margin: 1rem 0 !important;
+	}
+
+	.btn-recurrence-tres{
+		width: 90%;
+	}
+
+	.cont{
+		margin: 0 5%;
+	}
+
+	.cont-btns{
+		margin: 1rem 0 3rem 0;
+	}
+
+	.cupon{
+		width: 90%;
+	}
+
+	.form-group {
+	    display: block;
+	    margin: 1rem 0;
+	    width: 100%;
+	}
+
+	.form-group-select {
+    margin: 2rem 0;
+    width: 100%;
+}
+
+
+	.cont-form{
+		margin: 0 0%!important;
 	}
 
 }
-
