@@ -64,6 +64,12 @@ function BRM_recurrence_menu() {
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
     ),
+    'cart/recurrence/getAddress'=> array(
+  	'page callback' => 'getAddressByUser',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -156,6 +162,7 @@ function recurrenceTpl(){
       }
       //printVar($idKits);
     $variables['idKits']=$idKits;
+    $variables['address']=getAddressByUserId($user->uid);
       //printVar($order);
 	$variables['carrito']= uc_order_load($order_id);
 	return theme('recurrence',$variables);
@@ -585,7 +592,6 @@ function custonOrderCreate(){
 				}*/
 				//printVar($RecurrerORder);
 				foreach ($RecurrerORder as $key => $value) {
-					echo"111";
 					//$dataOrder=getProducDataByOrder($key);
 					$orderLoad=getOrderById($key);
 					//Se obtiene la recurrencia por usuario
@@ -1522,6 +1528,7 @@ function updateDateFromRecurrence($order_id){
 	->execute();
 }
 
+//Función para obtener el token y el tiempo de diferido
 function getDataTokenByOrder($order_id){
 	$datax=array();
 	$arrayRevolt=array();
@@ -1542,4 +1549,50 @@ function getDataTokenByOrder($order_id){
 	$unico=array_unique($datax);
 	//printVar($unico,'El unico');
 	return $unico;
+}
+
+//función para obtener las direcciones guardadas
+function getAddressByUserId($userId){
+	$datax=array();
+	$query=db_select('uc_orders','uo');
+	$result=$query->fields('uo',array('order_id','delivery_street1'))
+	->condition('uo.uid',$userId,'=')
+	->condition('uo.delivery_street1', '','<>')
+	->orderBy('uo.order_id', 'DESC')
+	->execute();
+	while ($record=$result->fetchAssoc()) {
+		//$datax[]['orderId']=$record['order_id'];
+		$datax[$record['order_id']]=$record['delivery_street1'];
+	}
+
+	//printVar($datax);
+	$unico=array_unique($datax);
+	return $unico;
+}
+function getAddressByUser(){
+	$filtro	=filter_input_array(INPUT_POST);
+	//printVar($filtro,$user);
+	if($filtro['vartC']=='addr'){
+		$orden=$filtro['consul'];
+		$datax=array();
+		$query=db_select('uc_orders','uo');
+		$result=$query->fields('uo',array('order_id','delivery_first_name','delivery_last_name','delivery_phone','delivery_street1','billing_first_name','billing_last_name','billing_phone','billing_street1'))
+		->condition('uo.order_id',$orden,'=')
+		->execute();
+		while ($record=$result->fetchAssoc()) {
+			//printVar($record);
+			$datax[]['delivery_first_name']=$record['delivery_first_name'];
+			$datax[]['delivery_last_name']=$record['delivery_last_name'];
+			$datax[]['delivery_phone']=$record['delivery_phone'];
+			$datax[]['delivery_street1']=$record['delivery_street1'];
+			$datax[]['billing_first_name']=$record['billing_first_name'];
+			$datax[]['billing_last_name']=$record['billing_last_name'];
+			$datax[]['billing_phone']=$record['billing_phone'];
+			$datax[]['billing_street1']=$record['billing_street1'];
+		}
+		drupal_json_output($datax);
+		//return $datax;
+	}else{
+		drupal_goto();
+	}
 }

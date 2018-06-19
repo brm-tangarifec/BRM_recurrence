@@ -77,7 +77,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 	<!--/- Info cliente -->
 
 	<!-- Info de entrega -->
-	<form action="/cart/recurrence/checkout-recurrence" class="uc-cart-checkout-form" method="POST" name='recurrenceForm' id="recurrenceForm">
+	<form action="/cart/recurrence/checkout-recurrence" class="uc-cart-checkout-form-recurrence" method="POST" name='recurrenceForm' id="recurrenceForm">
 	<div class="container">
 		<div class="row">
 			<fieldset class="cont text-center">
@@ -87,15 +87,18 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				</p>
 
 				<!-- Formulario 01 -->
-				<form>
 					<!-- Select one... -->
 					<div class="row cont-form">
 						<div class="form-group-select">
 							<label for="exampleInputPassword1">Dirección Guardada</label>
 							<div class="cont-select-dir">
-								<select class="form-control-select">
-									<option>- Selecct one -</option>
-									<option>1</option>
+								<select class="form-control-select" name="addressR" id="addressR">
+									<option value="">Seleccionar</option>
+									<?php
+									foreach ($variables['address'] as $keyA => $valueA) { ?>
+										<option value="<?php print($keyA);?>"><?php print($valueA);?></option>
+									<?php }	?>
+									
 								</select>								
 							</div>
 						</div>
@@ -103,28 +106,27 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<!-- Select one... -->
 					<div class="row cont-form">
 						<div class="form-group form-item">
-							<label for="exampleInputEmail1">*Nombre</label>
-							<input type="text" class="form-control-p" required/>
+							<label for="nombreEntrega">*Nombre</label>
+							<input type="text" class="form-control-p" name="nombreEntrega" id="nombreEntrega" value="" required/>
 						</div>
 
 						<div class="form-group">
-							<label for="exampleInputPassword1">*Apellido</label>
-							<input type="text" class="form-control-p" required/>
+							<label for="apellidoEntrega">*Apellido</label>
+							<input type="text" class="form-control-p" name="apellidoEntrega" id="apellidoEntrega" value="" required/>
 						</div>
 					</div>
 
 					<div class="row cont-form">            
 						<div class="form-group">
-							<label for="exampleInputPassword1">*Dirección</label>
-							<input type="text" class="form-control-p" required/>
+							<label for="direccionEntrega">*Dirección</label>
+							<input type="text" class="form-control-p" name="direccionEntrega" id="direccionEntrega" value="" required/>
 						</div>
 
 						<div class="form-group">
-							<label for="exampleInputPassword1">*Departamento</label>
+							<label for="departamentoEntrega">*Departamento</label>
 							<div class="cont-select">
-								<select class="form-control-p" required/>
-									<option>- Seleccionar -</option>
-									<option>1</option>
+								<select class="form-control-p" id="departamentoEntrega" name="departamentoEntrega" required/>
+									<option value="92" selected="selected">Distrito Capital</option>
 								</select>								
 							</div>
 						</div>
@@ -132,21 +134,19 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 					<div class="row cont-form">
 						<div class="form-group">
-							<label for="exampleInputPassword1">*Ciudad</label>
+							<label for="ciudadEntrega">*Ciudad</label>
 							<div class="cont-select">
-								<select class="form-control-p" required/>
-									<option>- Seleccionar -</option>
-									<option>1</option>
+								<select class="form-control-p" id="ciudadEntrega" name="ciudadEntrega" required/>
+								<option value="Bogotá D.C" selected="selected">Bogotá D.C</option>
 								</select>								
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label for="exampleInputPassword1">*Pais</label>
+							<label for="paisEntrega">*Pais</label>
 							<div class="cont-select">
-								<select class="form-control-p" required/>
-									<option>- Seleccionar -</option>
-									<option>1</option>
+								<select class="form-control-p" name="paisEntrega" id="paisEntrega" readonly required />
+									<option value="170" selected="selected">Colombia</option>
 								</select>								
 							</div>
 						</div>
@@ -154,11 +154,10 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 					<div class="row cont-form">
 						<div class="form-group form-item">
-							<label for="exampleInputEmail1">*Teléfono</label>
-							<input type="tel" class="form-control-p" required/>
+							<label for="telefonoEntrega">*Teléfono</label>
+							<input type="tel" class="form-control-p" name="telefonoEntrega" id="telefonoEntrega" value="" required/>
 						</div>
-					</div>
-				</form>			
+					</div>		
 			</fieldset>
 		</div>
 	</div>
@@ -176,7 +175,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div class="row">
 					<div class="checkbox">
 					  <label>
-					    <input type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
+					    <input type="checkbox" id="facturacion" value="S" aria-label="...">
 					  </label>
 					  <div class="text-check">
 						  <p>
@@ -187,6 +186,70 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					
 				</div>
 				<!--/- Formulario 02 -->
+				<legend class="text-title-recurrence">Información de entrega</legend>
+				<p>
+					Introduzca su dirección de entrega e información aquí
+				</p>
+
+				<!-- Formulario 01 -->
+					<!-- Select one... -->
+				<div class="facturacionForm">
+					<!-- Select one... -->
+					<div class="row cont-form">
+						<div class="form-group form-item">
+							<label for="nombreFacturacion">*Nombre</label>
+							<input type="text" class="form-control-p" name="nombreFacturacion" id="nombreFacturacion" value=""/>
+						</div>
+
+						<div class="form-group">
+							<label for="apellidoFacturacion">*Apellido</label>
+							<input type="text" class="form-control-p" name="apellidoFacturacion" id="apellidoFacturacion"/>
+						</div>
+					</div>
+
+					<div class="row cont-form">            
+						<div class="form-group">
+							<label for="direccionFacturacion">*Dirección</label>
+							<input type="text" class="form-control-p" name="direccionFacturacion" id="direccionFacturacion" value=""/>
+						</div>
+
+						<div class="form-group">
+							<label for="departamentoFacturacion">*Departamento</label>
+							<div class="cont-select">
+								<select class="form-control-p" name="departamentoFacturacion" id="departamentoFacturacion"/>
+									<option value="92" selected="selected">Distrito Capital</option>
+								</select>								
+							</div>
+						</div>
+					</div>
+
+					<div class="row cont-form">
+						<div class="form-group">
+							<label for="ciudadFacturacion">*Ciudad</label>
+							<div class="cont-select">
+								<select class="form-control-p" name="ciudadFacturacion" id="ciudadFacturacion" required/>
+									<option value="Bogotá D.C" selected="selected">Bogotá D.C</option>
+								</select>								
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="paisFacturacion">*Pais</label>
+							<div class="cont-select">
+								<select class="form-control-p" name="paisFacturacion" id="paisFacturacion" readonly />
+									<option value="170" selected="selected">Colombia</option>
+								</select>								
+							</div>
+						</div>
+					</div>
+
+					<div class="row cont-form">
+						<div class="form-group form-item">
+							<label for="telefonoFacturacion">*Teléfono</label>
+							<input type="tel" class="form-control-p" name="telefonoFacturacion" id="telefonoFacturacion" value="" />
+						</div>
+					</div>
+				</div>
 				<!--/- Formulario 02 -->
 			</fieldset>			
 		</div>
@@ -203,19 +266,21 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				</p>
 				<div class="row">
 					<div class="cupon">
-						<input type="text" class="form-control-p">
+						<input type="text" class="form-control-p" name="cuponUser" id="cuponUser">
 					</div>
 				</div>
 				<p class="help-block">
 					Ingresa un código de cupón y haz clic en "Aplicar al pedido" a continuación.
 				</p>
-				<button type="submit" class="btn-recurrence">APLICAR AL PEDIDO</button>
+				<button type="button" class="btn-recurrence addcouponcustom">APLICAR AL PEDIDO</button>
 			</fieldset>			
 		</div>
 	</div>
 	<!--/- Cupón Descuento -->
 
 	<!-- Frecuencia -->
+	<div class="container">
+		<div class="row">
 		<fieldset class="form-wrapper" id="recurrencia">
 
 			<legend>Frecuencia de pago</legend>
@@ -264,38 +329,38 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				
 				<div class="form-item">
 					<label for="franquicia">Nombre Tarjetahabiente</label>
-					<input type="text" id="tarjetahabiente" name="tarjetahabiente">
+					<input type="text" class="form-control-p" id="tarjetahabiente" name="tarjetahabiente">
 				</div>
 				<div class="form-item">
 					<label for="franquicia">Cédula Tarjetahabiente</label>
-					<input type="text" id="cedulahabiente" name="cedulahabiente">
+					<input type="text" class="form-control-p" id="cedulahabiente" name="cedulahabiente">
 				</div>
 				<div class="form-item">
 					<label for="franquicia">Cuotas</label>
-					<input type="number" name="cuotas" step="1" min="1" max="36">
+					<input type="number" class="form-control-p" name="cuotas" step="1" min="1" max="36">
 				</div>
 				<div class="form-item">
 					<label for="franquicia">Franquicia</label>
-					<input type="text" id="franquicia" name="franquicia">
+					<input type="text" class="form-control-p" id="franquicia" name="franquicia" readonly="readonly">
 				</div>
 
 				<div class="form-item">
 					<label for="numtc">Número de Tarjeta de Crédito</label>
-					<input type="num" id="numtc" name="numtc">
+					<input type="num" class="form-control-p" class="form-control-p" id="numtc" name="numtc">
 				</div>
 
 				<div class="form-item form-fecha-tc">
 					<label for="ven">Fecha de Vencimiento</label>
 					<div class="clearfix"></div>
-					<input class="form-tc" type="datetime" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
-					<input class="form-tc" type="num"  maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
+					<input class="form-tc" type="datetime" class="form-control-p" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
+					<input class="form-tc" type="num" class="form-control-p" maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
 					<div class="clearfix"></div>
 				</div>
 				<div class="clearfix"></div>
 
 				<div class="form-item push-half">
 					<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
-					<input type="num" id="cosec" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
+					<input type="num" id="cosec" class="form-control-p" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
 
 				</div>
 
@@ -305,6 +370,8 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 		</div>
 
 		</fieldset>
+	</div>
+</div>
 		<!--/- Frecuencia -->
 
 	<!-- Metodo de pago -->
@@ -348,7 +415,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 						<label>
 							<input type="radio" name="optionsRadios" id="#" value="#" disabled checked>
 						</label>
-						<img src="images/logopayulatam.png">
+						<img src="/sites/all/modules/uc_payulatam/img/logopayulatam.png">
 					</div>
 					<p>
 						Continúe con el proceso para completar el pago.

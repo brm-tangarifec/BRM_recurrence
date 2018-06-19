@@ -123,6 +123,39 @@ jQuery('.addcouponcustom').click(function(r){
 		});
 	}
 });
+
+//Función para traer las direcciones
+jQuery('#addressR').click(function(e){
+	//console.log('Hola le di click');
+	e.preventDefault();
+	var idAdd=jQuery('#addressR').val();
+	if(idAdd!=''){
+		console.log(idAdd);
+		jQuery.ajax({
+		type: "POST",
+		url: "/cart/recurrence/getAddress",
+		data:{
+		  consul:idAdd,
+		  vartC: 'addr' 
+		},
+		success: function(data){
+			console.log(data);
+			setTimeout(function(){
+				jQuery.each(data,function( index, value ){
+					jQuery('#nombreEntrega').val(value.delivery_first_name);
+					jQuery('#apellidoEntrega').val(value.delivery_last_name);
+					jQuery('#direccionEntrega').val(value.delivery_street1);
+					jQuery('#telefonoEntrega').val(value.delivery_phone);
+					jQuery('#nombreFacturacion').val(value.billing_first_name);
+					jQuery('#apellidoFacturacion').val(value.billing_last_name);
+					jQuery('#direccionFacturacion').val(value.billing_street1);
+					jQuery('#telefonoFacturacion').val(value.billing_phone);
+				});
+			},2000);
+		}
+	});
+	}
+});
 //Se activan la tarjeta registrada
 jQuery('.tarjetaR').click(function(l){
 	l.preventDefault();
@@ -133,32 +166,26 @@ jQuery('.tarjetaR').click(function(l){
 });
 
 //Pasar datos si está deschekeado mi direccion de facturación es la misma
-jQuery('#edit-panes-billing-copy-address').change(function(){
+jQuery('#facturacion').change(function(){
   if(jQuery(this).prop("checked")) {
-    jQuery('#edit-panes-billing-address--2').addClass('hidden');
+    jQuery('.facturacionForm').addClass('hidden');
   } else {
-    jQuery('#edit-panes-billing-address--2').removeClass('hidden');
+    jQuery('.facturacionForm').removeClass('hidden');
   }
 });
 
 
-jQuery('#edit-panes-delivery-delivery-first-name').blur(function(){
-	jQuery('#edit-panes-billing-billing-first-name').val(jQuery('#edit-panes-delivery-delivery-first-name').val());
+jQuery('#nombreEntrega').blur(function(){
+	jQuery('#nombreFacturacion').val(jQuery('#nombreEntrega').val());
 });
-jQuery('#edit-panes-delivery-delivery-last-name').blur(function(){
-	jQuery('#edit-panes-billing-billing-last-name').val(jQuery('#edit-panes-delivery-delivery-last-name').val());
+jQuery('#apellidoEntrega').blur(function(){
+	jQuery('#apellidoFacturacion').val(jQuery('#apellidoEntrega').val());
 });
-jQuery('#edit-panes-delivery-delivery-street1').blur(function(){
-	jQuery('#edit-panes-billing-billing-street1').val(jQuery('#edit-panes-delivery-delivery-street1').val());
+jQuery('#direccionEntrega').blur(function(){
+	jQuery('#direccionFacturacion').val(jQuery('#direccionEntrega').val());
 });
-jQuery('#edit-panes-delivery-delivery-zone').blur(function(){
-	jQuery('#edit-panes-billing-billing-zone').val(jQuery('#edit-panes-delivery-delivery-zone').val()).change();
-});
-jQuery('#edit-panes-delivery-delivery-country').blur(function(){
-	jQuery('#edit-panes-billing-billing-country').val(jQuery('#edit-panes-delivery-delivery-country').val());
-});
-jQuery('#edit-panes-delivery-delivery-phone').blur(function(){
-	jQuery('#edit-panes-billing-billing-phone').val(jQuery('#edit-panes-delivery-delivery-phone').val());
+jQuery('#telefonoEntrega').blur(function(){
+	jQuery('#telefonoFacturacion').val(jQuery('#telefonoEntrega').val());
 });
 /*if(window.location.href.indexOf('recurrence') > -1){
 	setTimeout(function(){
