@@ -274,6 +274,28 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				</p>
 				<div id="coupon-messages"></div>
 				<button type="button" class="btn-recurrence addcouponcustom">APLICAR AL PEDIDO</button>
+				<!-- Cupones activos -->
+				<div class="row">
+					<table class="table table-striped table-cupon">
+					<thead>
+						<tr>
+							<th>Cupones activos</th>
+							<th>Eliminar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								Cupón: BRMCLOBPONDS
+							</td>
+							<td>
+								<button type="submit" class="btn-recurrence-tres">ELIMINAR</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+				<!--/- Cupones activos -->
 			</fieldset>			
 		</div>
 	</div>

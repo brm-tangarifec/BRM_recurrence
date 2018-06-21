@@ -36,11 +36,16 @@ select{
     border: none;
     color: #ffffff;
     font-size: 2rem;
-    margin: 2rem auto !important;
+    margin: 2rem 1rem !important;
     padding: 1.3rem 1rem;
     transition: all ease-in-out .3s;
     vertical-align: bottom;
     width: 51%;
+}
+
+.alert{
+	width: 70%;
+	margin: 0 auto;
 }
 
 .btn-recurrence:hover{
@@ -62,11 +67,33 @@ select{
 }
 
 .btn-recurrence-dos:hover{
-	background-color: #1995a2; 
+	background-color: #1995a2;
+}
+
+.btn-recurrence-tres{
+	display: inline-block;
+    background-color: #20b7c8;
+    border-radius: 5px;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    margin: 0.5rem 1rem;
+    padding: 1.3rem 1rem;
+    transition: all ease-in-out .3s;
+    vertical-align: bottom;
+    width: 42%;
+}
+
+.btn-recurrence-tres:hover{
+	background-color: #1995a2;
 }
 
 .btn-active{
     background-color: #1995a2;
+}
+
+.canasta{
+	margin-top: 8%;
 }
 
 .cont{
@@ -79,7 +106,7 @@ select{
 }
 
 .cont p{
-	margin: 2rem 0; 
+	margin: 2rem 0;
 }
 
 .cont-pago{
@@ -196,6 +223,15 @@ select.form-control-p{
 	text-align: center;
 }
 
+.table>tbody>tr>td{
+	vertical-align: middle;
+}
+
+.table-cupon{
+	width: 94%;
+    margin: 0 auto;
+}
+
 .text-title-recurrence{
 	color:#20b7c8;
 	font-size: 2.5rem;
@@ -256,6 +292,10 @@ select.form-control-p{
 		width: 90%;
 	}
 
+	.canasta{
+		margin-top: 0; 
+	}
+
 	.cont{
 		margin: 0 5%;
 	}
@@ -290,6 +330,10 @@ select.form-control-p{
 
 	.m-der {
 	    margin:0 0 15px 0;
+	}
+
+	.table-cupon{
+		width: 100%;
 	}
 
 }
