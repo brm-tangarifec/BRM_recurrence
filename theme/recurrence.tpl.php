@@ -33,7 +33,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 <!--Nuevo-->
 <div class="container">
 		<div class="row">
-			<div class="cont">
+			<div class="cont canasta">
 				<legend class="text-title-recurrence">CANASTA</legend>
 				<table class="table table-striped">
 					<thead>
