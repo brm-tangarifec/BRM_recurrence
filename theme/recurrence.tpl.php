@@ -366,7 +366,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					</div>
 
 					<div class="row cont-form">
-						<div class="form-item push-half">
+						<div class="form-group form-item">
 							<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
 							<input type="num" id="cosec" class="form-control-p" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
 						</div>
