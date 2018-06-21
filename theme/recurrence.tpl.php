@@ -175,7 +175,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<div class="row">
 					<div class="checkbox">
 					  <label>
-					    <input type="checkbox" id="facturacion" value="S" aria-label="...">
+					    <input type="checkbox" id="copyfacturacion" name="copyfacturacion" value="S" aria-label="..." checked="checked">
 					  </label>
 					  <div class="text-check">
 						  <p>
@@ -193,7 +193,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 				<!-- Formulario 01 -->
 					<!-- Select one... -->
-				<div class="facturacionForm">
+				<div class="hidden facturacionForm">
 					<!-- Select one... -->
 					<div class="row cont-form">
 						<div class="form-group form-item">
@@ -272,6 +272,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<p class="help-block">
 					Ingresa un código de cupón y haz clic en "Aplicar al pedido" a continuación.
 				</p>
+				<div id="coupon-messages"></div>
 				<button type="button" class="btn-recurrence addcouponcustom">APLICAR AL PEDIDO</button>
 			</fieldset>			
 		</div>
@@ -281,9 +282,9 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 	<!-- Frecuencia -->
 	<div class="container">
 		<div class="row">
-		<fieldset class="form-wrapper" id="recurrencia">
+		<fieldset class="cont form-wrapper" id="recurrencia">
 
-			<legend>Frecuencia de pago</legend>
+			<legend class="text-title-recurrence">Frecuencia de pago</legend>
 
 			<div class="wrap-tarjetas">
 				<h3 class="text-center">Tarjetas vinculadas</h3>
@@ -321,52 +322,56 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 
 			<div class="clearfix"></div>
 			<div class="datoshabiente">
-			<h3 class="text-center">
+			<p class="text-center">
 				Agrega una nueva Frecuencia de Pago
-			</h3 class="center">
+			</p class="center">
 
 			<div class="fiedset-wrapper">
-				
-				<div class="form-item">
-					<label for="franquicia">Nombre Tarjetahabiente</label>
-					<input type="text" class="form-control-p" id="tarjetahabiente" name="tarjetahabiente">
-				</div>
-				<div class="form-item">
-					<label for="franquicia">Cédula Tarjetahabiente</label>
-					<input type="text" class="form-control-p" id="cedulahabiente" name="cedulahabiente">
-				</div>
-				<div class="form-item">
-					<label for="franquicia">Cuotas</label>
-					<input type="number" class="form-control-p" name="cuotas" step="1" min="1" max="36">
-				</div>
-				<div class="form-item">
-					<label for="franquicia">Franquicia</label>
-					<input type="text" class="form-control-p" id="franquicia" name="franquicia" readonly="readonly">
-				</div>
 
-				<div class="form-item">
-					<label for="numtc">Número de Tarjeta de Crédito</label>
-					<input type="num" class="form-control-p" class="form-control-p" id="numtc" name="numtc">
+					<div class="row cont-form">
+						<div class="form-group form-item">
+							<label for="franquicia">Nombre Tarjeta habiente</label>
+							<input type="text" class="form-control-p" id="tarjetahabiente" name="tarjetahabiente">
+						</div>
+						<div class="form-group form-item">
+							<label for="franquicia">Cédula Tarjeta habiente</label>
+							<input type="text" class="form-control-p" id="cedulahabiente" name="cedulahabiente">
+						</div>					
+					</div>
+
+					<div class="row cont-form">
+						<div class="form-group form-item">
+							<label for="franquicia">Cuotas</label>
+							<input type="number" class="form-control-p" name="cuotas" step="1" min="1" max="36">
+						</div>
+						<div class="form-group form-item">
+							<label for="franquicia">Franquicia</label>
+							<input type="text" class="form-control-p" id="franquicia" name="franquicia" readonly="readonly">
+						</div>
+					</div>
+
+					<div class="row cont-form">
+						<div class="form-group form-item">
+							<label for="numtc">Número de Tarjeta de Crédito</label>
+							<input type="num" class="form-control-p" class="form-control-p" id="numtc" name="numtc">
+						</div>
+
+						<div class="form-group form-item form-fecha-tc">
+							<label for="ven">Fecha de Vencimiento</label>
+							<div class="clearfix"></div>
+							<input type="datetime" class="form-control-n m-der" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
+							<input type="num" class="form-control-n" maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
+							<div class="clearfix"></div>
+						</div>
+					</div>
+
+					<div class="row cont-form">
+						<div class="form-item push-half">
+							<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
+							<input type="num" id="cosec" class="form-control-p" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
+						</div>
+					</div>
 				</div>
-
-				<div class="form-item form-fecha-tc">
-					<label for="ven">Fecha de Vencimiento</label>
-					<div class="clearfix"></div>
-					<input class="form-tc" type="datetime" class="form-control-p" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
-					<input class="form-tc" type="num" class="form-control-p" maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
-					<div class="clearfix"></div>
-				</div>
-				<div class="clearfix"></div>
-
-				<div class="form-item push-half">
-					<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
-					<input type="num" id="cosec" class="form-control-p" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
-
-				</div>
-
-				<div class="clearfix"></div>
-
-			</div>
 		</div>
 
 		</fieldset>

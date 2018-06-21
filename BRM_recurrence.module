@@ -1251,37 +1251,36 @@ function recurrencecheck(){
 	$varPost=filter_input_array(INPUT_POST);
 	global $user;
 	$params=array();
-	//die();
 	//Datos para la orden
-	$params['PAYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
+	$params['PAYER_NAME']=$varPost['nombreEntrega'].' '.$varPost['apellidoEntrega'];
 	$params['PAYER_EMAIL']=$user->mail;
-	$params['PAYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+	$params['PAYER_CONTACT_PHONE']=$varPost['telefonoEntrega'];
 	
-	$params['PAYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));
+	$params['PAYER_STREET']=removeAccents(limpiaCadena($varPost['direccionEntrega']));
 	$params['PAYER_STREET_2']='';
-	$params['PAYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
-	$params['PAYER_STATE']=$varPost['panes']['delivery']['delivery_zone'];
-	$params['PAYER_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+	$params['PAYER_CITY']=$varPost['ciudadEntrega'];
+	$params['PAYER_STATE']=$varPost['departamentoEntrega'];
+	$params['PAYER_PHONE']=$varPost['telefonoEntrega'];
 
-	if($varPost['panes']['billing']['copy_address']=='1'){
-	$params['BUYER_NAME']=$varPost['panes']['delivery']['delivery_first_name'].' '.$varPost['panes']['delivery']['delivery_last_name'];
+	if(isset($varPost['copyfacturacion']) && $varPost['copyfacturacion']=='S'){
+	$params['BUYER_NAME']=$varPost['nombreEntrega'].' '.$varPost['apellidoEntrega'];
 	$params['BUYER_EMAIL']=$user->mail;
-	$params['BUYER_CONTACT_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
-	$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['delivery']['delivery_street1']));;
+	$params['BUYER_CONTACT_PHONE']=$varPost['telefonoEntrega'];
+	$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['direccionEntrega']));;
 	$params['BUYER_STREET_2']='';
-	$params['BUYER_CITY']=$varPost['panes']['delivery']['delivery_city'];
-	$params['BUYER_STATE']=$varPost['panes']['delivery']['delivery_zone'];
-	$params['BUYER_PHONE']=$varPost['panes']['delivery']['delivery_phone'];
+	$params['BUYER_CITY']=$varPost['ciudadEntrega'];
+	$params['BUYER_STATE']=$varPost['departamentoEntrega'];
+	$params['BUYER_PHONE']=$varPost['telefonoEntrega'];
 
 	}else{
-		$params['BUYER_NAME']=$varPost['panes']['billing']['billing_first_name'].' '.$varPost['panes']['billing']['billing_last_name'];
+		$params['BUYER_NAME']=$varPost['nombreFacturacion'].' '.$varPost['apellidoFacturacion'];
 		$params['BUYER_EMAIL']=$user->mail;
-		$params['BUYER_CONTACT_PHONE']=$varPost['panes']['billing']['billing_phone'];
-		$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['panes']['billing']['billing_street1']));
+		$params['BUYER_CONTACT_PHONE']=$varPost['direccionFacturacion'];
+		$params['BUYER_STREET']=removeAccents(limpiaCadena($varPost['direccionFacturacion']));
 		$params['BUYER_STREET_2']='';
-		$params['BUYER_CITY']=$varPost['panes']['billing']['billing_city'];
-		$params['BUYER_STATE']=$varPost['panes']['billing']['billing_zone'];
-		$params['BUYER_PHONE']=$varPost['panes']['billing']['billing_phone'];
+		$params['BUYER_CITY']=$varPost['ciudadFacturacion'];
+		$params['BUYER_STATE']=$varPost['departamentoFacturacion'];
+		$params['BUYER_PHONE']=$varPost['telefonoFacturacion'];
 
 	}
 //die();
@@ -1295,27 +1294,27 @@ function recurrencecheck(){
 	$orderC = uc_order_load($order_id);
 
 	if($orderC->order_status=='in_checkout'){
-		$orderC->delivery_first_name=$varPost['panes']['delivery']['delivery_first_name'];
-		$orderC->delivery_last_name=$varPost['panes']['delivery']['delivery_last_name'];
-		$orderC->delivery_phone=$varPost['panes']['delivery']['delivery_phone'];
-		$orderC->delivery_street1=$varPost['panes']['delivery']['delivery_street1'];
-		$orderC->delivery_city=$varPost['panes']['delivery']['delivery_city'];
-		$orderC->delivery_zone=$varPost['panes']['delivery']['delivery_zone'];
+		$orderC->delivery_first_name=$varPost['nombreEntrega'];
+		$orderC->delivery_last_name=$varPost['apellidoEntrega'];
+		$orderC->delivery_phone=$varPost['telefonoEntrega'];
+		$orderC->delivery_street1=$varPost['direccionEntrega'];
+		$orderC->delivery_city=$varPost['ciudadEntrega'];
+		$orderC->delivery_zone=$varPost['departamentoEntrega'];
 		$orderC->delivery_country=$orderLoad->delivery_country;
-		if($varPost['panes']['billing']['copy_address']=='1'){
-			$orderC->billing_first_name=$varPost['panes']['delivery']['delivery_first_name'];
-			$orderC->billing_last_name=$varPost['panes']['delivery']['delivery_last_name'];
-			$orderC->billing_phone=$varPost['panes']['delivery']['delivery_phone'];
-			$orderC->billing_street1=$varPost['panes']['delivery']['delivery_street1'];
-			$orderC->billing_city=$varPost['panes']['delivery']['delivery_city'];
-			$orderC->billing_zone=$varPost['panes']['delivery']['delivery_zone'];
+		if(isset($varPost['copyfacturacion']) && $varPost['copyfacturacion']=='S'){
+			$orderC->billing_first_name=$varPost['nombreEntrega'];
+			$orderC->billing_last_name=$varPost['apellidoEntrega'];
+			$orderC->billing_phone=$varPost['telefonoEntrega'];
+			$orderC->billing_street1=$varPost['direccionEntrega'];
+			$orderC->billing_city=$varPost['ciudadEntrega'];
+			$orderC->billing_zone=$varPost['departamentoEntrega'];
 		}else{
-			$orderC->billing_first_name=$varPost['panes']['billing']['billing_first_name'];
-			$orderC->billing_last_name=$varPost['panes']['billing']['billing_last_name'];
-			$orderC->billing_phone=$varPost['panes']['billing']['billing_phone'];
-			$orderC->billing_street1=$varPost['panes']['billing']['billing_street1'];
-			$orderC->billing_city=$varPost['panes']['billing']['billing_city'];
-			$orderC->billing_zone=$varPost['panes']['billing']['billing_zone'];
+			$orderC->billing_first_name=$varPost['nombreFacturacion'];
+			$orderC->billing_last_name=$varPost['apellidoFacturacion'];
+			$orderC->billing_phone=$varPost['telefonoFacturacion'];
+			$orderC->billing_street1=$varPost['direccionFacturacion'];
+			$orderC->billing_city=$varPost['ciudadFacturacion'];
+			$orderC->billing_zone=$varPost['departamentoFacturacion'];
 		}
 		$orderC->payment_method = 'payulatam';
 		if(empty($orderC->data)){
@@ -1579,16 +1578,18 @@ function getAddressByUser(){
 		$result=$query->fields('uo',array('order_id','delivery_first_name','delivery_last_name','delivery_phone','delivery_street1','billing_first_name','billing_last_name','billing_phone','billing_street1'))
 		->condition('uo.order_id',$orden,'=')
 		->execute();
+		$datar=0;
 		while ($record=$result->fetchAssoc()) {
 			//printVar($record);
-			$datax[]['delivery_first_name']=$record['delivery_first_name'];
-			$datax[]['delivery_last_name']=$record['delivery_last_name'];
-			$datax[]['delivery_phone']=$record['delivery_phone'];
-			$datax[]['delivery_street1']=$record['delivery_street1'];
-			$datax[]['billing_first_name']=$record['billing_first_name'];
-			$datax[]['billing_last_name']=$record['billing_last_name'];
-			$datax[]['billing_phone']=$record['billing_phone'];
-			$datax[]['billing_street1']=$record['billing_street1'];
+			$datax[$datar]['delivery_first_name']=$record['delivery_first_name'];
+			$datax[$datar]['delivery_last_name']=$record['delivery_last_name'];
+			$datax[$datar]['delivery_phone']=$record['delivery_phone'];
+			$datax[$datar]['delivery_street1']=$record['delivery_street1'];
+			$datax[$datar]['billing_first_name']=$record['billing_first_name'];
+			$datax[$datar]['billing_last_name']=$record['billing_last_name'];
+			$datax[$datar]['billing_phone']=$record['billing_phone'];
+			$datax[$datar]['billing_street1']=$record['billing_street1'];
+			$datar++;
 		}
 		drupal_json_output($datax);
 		//return $datax;

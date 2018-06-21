@@ -118,14 +118,14 @@ jQuery('.addcouponcustom').click(function(r){
 			  	jQuery('.descuentoCupon').text('');
 			  	jQuery('.descuentoCupon').text(data.descuento);
 			  }
-			  jQuery('.messageCoupon').html(data.mensaje);
+			  jQuery('.help-block').html(data.mensaje);
 			}
 		});
 	}
 });
 
 //Función para traer las direcciones
-jQuery('#addressR').click(function(e){
+jQuery('#addressR').change(function(e){
 	//console.log('Hola le di click');
 	e.preventDefault();
 	var idAdd=jQuery('#addressR').val();
@@ -140,8 +140,10 @@ jQuery('#addressR').click(function(e){
 		},
 		success: function(data){
 			console.log(data);
-			setTimeout(function(){
+			//setTimeout(function(){
 				jQuery.each(data,function( index, value ){
+					console.log(value.delivery_first_name);
+					//console.log(jQuery('#nombreEntrega').val());
 					jQuery('#nombreEntrega').val(value.delivery_first_name);
 					jQuery('#apellidoEntrega').val(value.delivery_last_name);
 					jQuery('#direccionEntrega').val(value.delivery_street1);
@@ -151,7 +153,7 @@ jQuery('#addressR').click(function(e){
 					jQuery('#direccionFacturacion').val(value.billing_street1);
 					jQuery('#telefonoFacturacion').val(value.billing_phone);
 				});
-			},2000);
+			//},2000);
 		}
 	});
 	}

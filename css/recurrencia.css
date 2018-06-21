@@ -19,6 +19,10 @@ label{
 	letter-spacing: 0.1rem;
 }
 
+label span{
+	font-size: 1.5rem;
+}
+
 select{
 	border: 0;
 }
@@ -148,9 +152,20 @@ select{
 
 .form-control-p{
 	background-color: #f5f5f5;
+	color: #737373;
     box-shadow:none;
     height: 50px;
+    padding: 0 1.5rem;
     width: 100%;
+}
+
+.form-control-n{
+	background-color: #f5f5f5;
+    box-shadow:none;
+    color: #737373;
+    height: 50px;
+    padding: 0 1.5rem;
+    width: 47%;
 }
 
 select.form-control-p{
@@ -215,7 +230,19 @@ select.form-control-p{
 	margin: 0;
 }
 
+.label-n-tarjeta label{
+	display: block;
+}
+
+.m-der{
+	margin-right: 4%;
+}
+
 @media (max-width: 768px){
+	label{
+		margin-bottom: 5px;
+	}
+
 	.btn-recurrence{
 		width: 85%;
 	}
@@ -248,13 +275,21 @@ select.form-control-p{
 	}
 
 	.form-group-select {
-    margin: 2rem 0;
-    width: 100%;
-}
+	    margin: 2rem 0;
+	    width: 100%;
+	}
+
+	.form-control-n{
+		width: 100%;
+	}
 
 
 	.cont-form{
 		margin: 0 0%!important;
+	}
+
+	.m-der {
+	    margin:0 0 15px 0;
 	}
 
 }
