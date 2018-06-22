@@ -94,6 +94,7 @@ jQuery('#numtc').blur(function(r){
 		});
 	}
 });
+//Se agrega el cupón
 jQuery('.addcouponcustom').click(function(r){
 	//console.log('Hola le di click');
 	r.preventDefault();
@@ -115,14 +116,52 @@ jQuery('.addcouponcustom').click(function(r){
 			  	jQuery('#cuponUser').hide();
 			  }
 			  if(data.descuento!=0){
-			  	jQuery('.descuentoCupon').text('');
+			  	jQuery('.titleCupon').parent().removeClass('hidden');
+			  	jQuery('.titleCupon').text(data.title);
+			  	jQuery('.addcouponcustom').addClass('hidden');
+			  	jQuery('.cuponAddd').removeClass('hidden');
+			  	jQuery('.table-cupon').removeClass('hidden');
 			  	jQuery('.descuentoCupon').text(data.descuento);
+			  	jQuery('.pintaCupon').html('<tr><td class="titleCupon">'+data.title+'</td><td><button type="button" class="btn-recurrence-tres removeCupon" data-line="'+data.line_item+'">ELIMINAR</button></td></tr>')
+
+
 			  }
 			  jQuery('.help-block').html(data.mensaje);
 			}
 		});
 	}
 });
+
+//Se remueve el cupón
+jQuery(document).on('click','.removeCupon',function(e){
+	//console.log('Hola le di click');
+	e.preventDefault();
+	var coupon=jQuery(this).attr('data-line');
+	if(coupon!=''){
+		console.log(coupon);
+		jQuery.ajax({
+		type: "POST",
+		url: "/cart/recurrence/removeCupon",
+		data:{
+		  consul:coupon,
+		  vartC: 'rmcp' 
+		},
+
+			success: function(data){
+				if(data==1){
+					jQuery('.titleCupon').parent().addClass('hidden');
+				  	jQuery('.cuponAddd').addClass('hidden');
+				  	jQuery('.table-cupon').addClass('hidden');
+				  	jQuery('.descuentoCupon').text('');
+				  	jQuery('.descuentoCupon').text(data.descuento);
+				  	jQuery('.addcouponcustom').removeClass('hidden');
+				  	jQuery('#cuponUser').show();
+				}
+			}
+		});
+	}
+});
+
 
 //Función para traer las direcciones
 jQuery('#addressR').change(function(e){

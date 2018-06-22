@@ -20,7 +20,7 @@ if($subtotal==0){
 	header("Refresh:0");
 }
 
-//die();
+
 
  //función para calcular el costo del envío
  //printVar($orderRecurrence->order_id,'Se consulta');
@@ -28,6 +28,7 @@ $envio=shippingRecurrence($variables['idKits'],$subtotal);
 $descuento=getCuponFromOrder($orderRecurrence->order_id);
 //Se agrega el Valor del envío a la orden
 updateLineShipping($orderRecurrence->order_id,$envio);
+
 ?>
 <script type="text/javascript" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></script> <noscript> <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src="https://maf.pagosonline.net/ws/fp/tags.js?id=${deviceSessionId}80200"></iframe> </noscript>
 <!--Nuevo-->
@@ -48,11 +49,23 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 						<tr>
 							<td><?php print($productos->qty);?> ×</td>
 							<td>
-								<a href="<?php print(drupal_get_path_alias('node/'.$productos->nid)); ?>"><?php print($productos->title);?></a>
+								<a href="/<?php print(drupal_get_path_alias('node/'.$productos->nid)); ?>"><?php print($productos->title);?></a>
 							</td>
 							<td><?php print(uc_currency_format($productos->price));?></td>
 						</tr>
-						<?php }	?>
+						<?php }
+						if(!empty($variables['regalo'])){ ?>
+						<tr>
+							<td><?php print($variables['regalo']['qty']);?> ×</td>
+							<td>
+								<a href="/<?php print(drupal_get_path_alias('node/'.$variables['regalo']['nid'])); ?>"><?php print(node_load($variables['regalo']['nid'])->title);?></a>
+							</td>
+							<td>0</td>
+						</tr>
+						<?php } ?>
+						<tr>
+							<td colspan="3"><span>Subtotal: <?php print(uc_currency_format($subtotal));?></span></td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
@@ -260,38 +273,48 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 	<div class="container">
 		<div class="row">
 			<fieldset class="cont text-center">
+				<?php $claseH=''; if($descuento!=0){$claseH='hidden';};?>
 				<legend class="text-title-recurrence">CUPÓN DE DESCUENTO</legend>
-				<p>
+				<p class="<?php print($claseH); ?>">
 					Ingrese un cupón para este pedido.
 				</p>
-				<div class="row">
+				<div class="row <?php print($claseH);?>">
 					<div class="cupon">
 						<input type="text" class="form-control-p" name="cuponUser" id="cuponUser">
 					</div>
 				</div>
-				<p class="help-block">
+				<p class="help-block <?php print($claseH); ?>">
 					Ingresa un código de cupón y haz clic en "Aplicar al pedido" a continuación.
 				</p>
 				<div id="coupon-messages"></div>
-				<button type="button" class="btn-recurrence addcouponcustom">APLICAR AL PEDIDO</button>
+				<button type="button" class="btn-recurrence addcouponcustom <?php print($claseH); ?>">APLICAR AL PEDIDO</button>
 				<!-- Cupones activos -->
 				<div class="row">
-					<table class="table table-striped table-cupon">
+					<?php $claseH=''; if($descuento==0){$claseH='hidden';};?>
+					<table class="table table-striped table-cupon <?php print($claseH);?>">
 					<thead>
 						<tr>
 							<th>Cupones activos</th>
 							<th>Eliminar</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td>
-								Cupón: BRMCLOBPONDS
+					<tbody class="pintaCupon">
+						<?php
+						if($descuento!=0){
+							$descuentoCupon;
+							foreach($descuento as $keyDescuento => $valueCupon){
+								$descuentoCupon=$valueCupon['amount'];
+							?>
+							<tr>
+							<td class="titleCupon">
+								<?php print($valueCupon['titulo']);?>
 							</td>
 							<td>
-								<button type="submit" class="btn-recurrence-tres">ELIMINAR</button>
-							</td>
-						</tr>
+								<button type="button" class="btn-recurrence-tres removeCupon" data-line="<?php print($valueCupon['line_id']); ?>">ELIMINAR</button>
+								</td>
+							</tr>
+						<?php } 
+						 } ?>
 					</tbody>
 				</table>
 				</div>
@@ -318,7 +341,6 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					  $getCard=getDataTokerPerUser($userR->uid);
 					  //printVar($getCard);
 					  foreach ($getCard as $key => $card) {
-					  	printVar($card);
 					  	$franquicia=$card['franchise'];
 					  	$carMask=substr($card['card_mask'],-4);
 					  	?>
@@ -408,9 +430,12 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 				<legend class="text-title-recurrence">MÉTODO DE PAGO</legend>
 				<table class="table table-bordered">
 					<tbody>
-						<tr>
+						<?php $claseH=''; if($descuento==0){$claseH='hidden';};?>
+						<tr class="cuponAddd <?php print($claseH);?>">
+
+							
 							<td>Cupón:</td>
-							<td><?php print(uc_currency_format($descuento));?></td>
+							<td class="descuentoCupon"><?php print(uc_currency_format($descuentoCupon));?></td>
 						</tr>
 						<tr>
 							<td>Subtotal:</td>

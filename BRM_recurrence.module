@@ -70,6 +70,12 @@ function BRM_recurrence_menu() {
   	'access callback' => TRUE,
   	'type' => MENU_CALLBACK,
     ),
+    'cart/recurrence/removeCupon'=> array(
+  	'page callback' => 'removeLineItemRecurrenceU',
+  	'access arguments' => TRUE,
+  	'access callback' => TRUE,
+  	'type' => MENU_CALLBACK,
+    ),
   );
 }
 
@@ -156,15 +162,59 @@ function recurrenceTpl(){
       $idKits=array();
       foreach ($carritoR as $key => $valueKit) {
       	//printVar($valueKit->kitId);
-      	if (!in_array($valueKit->kitId, $idKits)) {
+      	if (!in_array($valueKit->kitId, $idKits)) {	
       		array_push($idKits,$valueKit->kitId);
       	}
       }
-      //printVar($idKits);
+
+        if (user_is_logged_in() ) {
+
+		    $anterioresCompras = BRM_ponds_uc_orders_by_user($order->uid);
+		    //removeFromCartByNodeId();
+		    $as=alreadyExistGift();
+		    if(!$anterioresCompras && !$as){
+		      //removeFromCartByNodeId($order->order_id); 
+		      $valid = BRM_ponds_valid_gift($order);
+		      //printVar($valid);
+		      //var_dump($valid);
+		      if($valid){
+		        $return = add_gift_to_cart();
+		        //print_r($valid);
+		      }else{
+		        //echo 'Hola';
+		        //die();
+		        removeFromCartByNodeId($order->order_id);
+		        echo '<pre id="debugjson" style="display:none;">';
+		        printVar('no agrego no supera margen de compra ','stock array');
+		        echo '</pre>';
+		      }
+		    }else{
+		        echo '<pre id="debugjson" style="display:none;">';
+		        printVar('no agrego ya tiene compras o ya tiene regalo','stock array');
+		        echo '</pre>';
+		    }
+		  }else{
+		            echo '<pre id="debugjson" style="display:none;" >';
+		        printVar('no agrego no logueado','stock array');
+		        echo '</pre>';
+		  }
+	$nodeId=array('98','99');
+	$items = uc_cart_get_contents();
+	$regalo=array();
+	foreach ($items as $item) {
+		if(in_array($item->nid, $nodeId)){
+			$regalo['qty']=$item->qty;
+			$regalo['nid']=$item->nid;
+			break;
+		}
+	}
+	//printVar($regalo);
+	//die();
     $variables['idKits']=$idKits;
     $variables['address']=getAddressByUserId($user->uid);
       //printVar($order);
 	$variables['carrito']= uc_order_load($order_id);
+	$variables['regalo']= $regalo;
 	return theme('recurrence',$variables);
 }
 
@@ -1452,12 +1502,21 @@ function addCouponCustom(){
 			$message=$addCoupon->message;
 			$desc=$addCoupon->pretax_amount;
 			addCouponToOrderCustom($addCoupon,$order['order_id']);
+
+			$line=db_select('uc_order_line_items','ul');
+			$result=$line->fields('ul',array('line_item_id'))
+			->condition('ul.order_id',$order['order_id'],'=')
+			->condition('ul.type','coupon','=')
+			->execute();
+			$record=$result->fetchAssoc();
+			$record2=$record['line_item_id'];
 		}else{
 			$title=$addCoupon->title;
 			$message=$addCoupon->message;
 			$desc=0;
+			$record2='';
 		}
-		$datosCupon=array('title'=>$title,'mensaje'=>$message,'descuento'=>'-'.uc_currency_format($desc));
+		$datosCupon=array('title'=>$title,'mensaje'=>$message,'descuento'=>'-'.uc_currency_format($desc),'line_item'=>$record2);
 		drupal_json_output($datosCupon);
 		//printVar($addCoupon,'Respuesta cupon');
 		//printVar($message,'Mensaje');
@@ -1503,19 +1562,42 @@ function addCouponToOrderCustom($cupon,$order_id){
 
 //función para obtener el descuento aplicado
 function getCuponFromOrder($order_id){
+	$datax=array();
 		$query=db_select('uc_order_line_items','ul');
-		$result=$query->fields('ul',array('amount'))
+		$result=$query->fields('ul',array('line_item_id','amount','title'))
 		->condition('ul.order_id',$order_id,'=')
 		->condition('ul.type','coupon','=')
-		//->condition('type','tax','!=')
 		->execute();
-		$record=$result->fetchAssoc();
-		if(!empty($record)){
-			$descuento=$record['amount'];
-		}else{
-			$descuento=0;
+		$contador=0;
+		while ($record=$result->fetchAssoc()) {
+			$datax[$contador]['line_id']=$record['line_item_id'];
+			$datax[$contador]['titulo']=$record['title'];
+			$datax[$contador]['amount']=$record['amount'];
+			$contador++;
 		}
-		return $descuento;
+		if(empty($datax)){
+			$datax=0;
+		}
+
+		return $datax;
+
+
+}
+
+//Función para remover un item
+function removeLineItemRecurrenceU(){
+	$varPost=filter_input_array(INPUT_POST);
+	if($varPost['vartC']=='rmcp'){
+		$lineItem=removeLineItemRecurrence($varPost['consul']);
+		drupal_json_output($lineItem);
+	}
+}
+function removeLineItemRecurrence($lideId){
+
+	$delete=db_delete('uc_order_line_items')
+	->condition('line_item_id', $lideId)
+	->execute();
+	return $delete;
 }
 
 
