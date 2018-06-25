@@ -74,7 +74,16 @@ jQuery(document).ready(function($){
 	  }
 	}
 
-	//Comprobar franquicia
+
+//Se muestra modal del regalo
+if(jQuery('.showGif').length>0){
+	var m = '<h3>Hemos agregado un producto de regalo</h3><img src="http://www.clubponds.com/sites/default/files/producto/FlawlessWhite_Serumespanol.jpg"><p>Completa la compra para poder disfrutar de tu regalo.</p>';
+	jQuery('#descripcion-modalmensaje').html(m);
+	jQuery('#modalTitle').text("Hemos agregado un producto de regalo");
+	jQuery('#modalMensajes').modal('show');
+
+}
+//Comprobar franquicia
 
 jQuery('#numtc').blur(function(r){
 	var numtc=jQuery('#numtc').val();
@@ -114,18 +123,19 @@ jQuery('.addcouponcustom').click(function(r){
 			  if(data.title!='Desconocido'){
 			  	jQuery('.titleCoupon').text(data.title);
 			  	jQuery('#cuponUser').hide();
+			  	if(data.descuento!=0){
+				  	jQuery('.titleCupon').parent().removeClass('hidden');
+				  	jQuery('.titleCupon').text(data.title);
+				  	jQuery('.addcouponcustom').addClass('hidden');
+				  	jQuery('.cuponAddd').removeClass('hidden');
+				  	jQuery('.table-cupon').removeClass('hidden');
+				  	jQuery('.descuentoCupon').text(data.descuento);
+				  	jQuery('.pintaCupon').html('<tr><td class="titleCupon">'+data.title+'</td><td><button type="button" class="btn-recurrence-tres removeCupon" data-line="'+data.line_item+'">ELIMINAR</button></td></tr>');
+			  	}
+			  }else{
+			  	jQuery('#cuponUser').css('border', '1px solid red');
 			  }
-			  if(data.descuento!=0){
-			  	jQuery('.titleCupon').parent().removeClass('hidden');
-			  	jQuery('.titleCupon').text(data.title);
-			  	jQuery('.addcouponcustom').addClass('hidden');
-			  	jQuery('.cuponAddd').removeClass('hidden');
-			  	jQuery('.table-cupon').removeClass('hidden');
-			  	jQuery('.descuentoCupon').text(data.descuento);
-			  	jQuery('.pintaCupon').html('<tr><td class="titleCupon">'+data.title+'</td><td><button type="button" class="btn-recurrence-tres removeCupon" data-line="'+data.line_item+'">ELIMINAR</button></td></tr>')
-
-
-			  }
+			  
 			  jQuery('.help-block').html(data.mensaje);
 			}
 		});
@@ -207,7 +217,7 @@ jQuery('.tarjetaR').click(function(l){
 });
 
 //Pasar datos si está deschekeado mi direccion de facturación es la misma
-jQuery('#facturacion').change(function(){
+jQuery('#copyfacturacion').change(function(){
   if(jQuery(this).prop("checked")) {
     jQuery('.facturacionForm').addClass('hidden');
   } else {
@@ -215,6 +225,118 @@ jQuery('#facturacion').change(function(){
   }
 });
 
+
+//Validación del formulario
+jQuery('.comprar-recurrence').click(function(r){
+	var form = jQuery('#recurrenceForm');
+    var text = jQuery(form).find('input[type=text]');
+    var numberT = jQuery(form).find('input[type=number]');
+    var selects = jQuery(form).find('select');
+    var error = [];
+    var msn = '';
+    for (var i = 0; i < text.length; i++) {
+
+        var t = jQuery(text[i]).val().trim();
+        var nt = jQuery(numberT[i]).val();
+        if(nt==''){
+        	jQuery(numberT[i]).css('border', '1px solid red');
+        }
+        if (t == '') {
+            if (jQuery(text[i]).attr('name') != 'cuponUser') {
+                jQuery(text[i]).css('border', '1px solid red');
+                error.push(jQuery(text[i]));
+                var exist =existMesaje(msn,'todos los campos resaltados son necesarios');
+                if(exist==false){
+                    msn+='Recuerda que todos los campos resaltados son necesarios *';
+                }
+            }
+        } else {
+            if (jQuery(text[i]).attr('name') == 'apellidoEntrega' ||
+                //jQuery(text[i]).attr('name') == 'panes[delivery][delivery_city]' ||
+                jQuery(text[i]).attr('name') == 'nombreEntrega'
+
+                ||
+                jQuery(text[i]).attr('name') == 'nombreFacturacion' ||
+                jQuery(text[i]).attr('name') == 'apellidoFacturacion') {
+                var r = validaCadena(jQuery(text[i]).val(), 'cadena');
+                if (r) {
+                    jQuery(text[i]).css('border', '1px solid #fff');
+                } else {
+                    jQuery(text[i]).css('border', '1px solid red');
+                    error.push(jQuery(text[i]));
+                    switch (jQuery(text[i]).attr('name')) {
+                    case 'apellidoEntrega':
+                    case 'apellidoFacturacion':
+                        msn += 'Valida la información ingresada en el campo apellido *';
+                        break;
+
+                    case 'nombreEntrega':
+                    case 'nombreFacturacion':
+                        msn += 'Valida la información ingresada en el campo nombre *';
+                        break;
+                }
+                }
+            }
+            if (jQuery(text[i]).attr('name') == 'direccionEntrega' || jQuery(text[i]).attr('name') == 'direccionFacturacion') {
+                jQuery(text[i]).css('border', '1px solid #fff');
+            }
+            if (jQuery(text[i]).attr('name') == 'telefonoEntrega' ||
+                jQuery(text[i]).attr('name') == 'telefonoFacturacion') {
+                var r = validaCadena(jQuery(text[i]).val(), 'numero');
+                if(jQuery(text[i]).val() != ''){
+                    if (r) {
+                        jQuery(text[i]).css('border', '1px solid #fff');
+                    } else {
+                        jQuery(text[i]).css('border', '1px solid red');
+                        error.push(jQuery(text[i]));
+                         msn += 'Valida la información en el campo teléfono *';
+                    }
+                }
+            } 
+        }
+
+    }
+    if (msn != '') {
+        showmodalR(msn);
+    }
+
+        if (error.length == 0) {
+        //google event
+        jQuery('#recurrenceForm').submit();
+    }
+        //jQuery(form).submit();
+
+});
+function showmodalR(msn) {
+    var split = msn.split('*');
+    var m = '<ul>';
+    for (var i = 0; i < split.length; i++) {
+        m += '<li>' + split[i] + '</li>';
+        if ((split.length - 1) == 1) {
+            m += '</ul>';
+        }
+    }
+    if (m.indexOf('<li></li>') !== -1) {
+        var res = m.replace("<li></li>", "");
+        m = res;
+    }
+    if(msn.indexOf('han enviado')!= -1){
+        jQuery('h3#modalTitle').text('Para finalizar el proceso');
+        //console.log('desde restore password');
+    }else{
+        jQuery('#modalTitle').text('Valida la siguiente información');
+        //console.log('no  desde restore password');
+
+    }
+    jQuery('#descripcion-modalmensaje').html(m);
+    jQuery('#modalMensajes').modal('show');
+
+}
+
+jQuery('.cancel-recurrence').click(function(e){
+	window.location="/cart";
+});
+//Fin validación
 
 jQuery('#nombreEntrega').blur(function(){
 	jQuery('#nombreFacturacion').val(jQuery('#nombreEntrega').val());

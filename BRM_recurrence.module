@@ -125,6 +125,8 @@ function BRM_recurrence_theme($existing, $type, $theme, $path){
 /*Obtener el tpl para activar la recurrencia*/
 function recurrenceTpl(){
 	drupal_add_css(drupal_get_path('module', 'BRM_recurrence') .'/css/recurrencia.css' , array('group' => CSS_DEFAULT, 'every_page' => false));
+
+	drupal_add_js(drupal_get_path('module', 'BRM_recurrence') . '/js/jquery.form-validator.min.js', array( 'scope' => 'footer', 'weight' => 3 , 'group' => JS_LIBRARY, 'preprocess' => FALSE, 'cache' => FALSE));
 	global $user;
 	//printVar($user->uid);
 	//printVar(base64_decode($_COOKIE['carritoR']));

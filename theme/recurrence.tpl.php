@@ -62,6 +62,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 							</td>
 							<td>0</td>
 						</tr>
+						<span class="showGif" data-gif="true"></span>
 						<?php } ?>
 						<tr>
 							<td colspan="3"><span>Subtotal: <?php print(uc_currency_format($subtotal));?></span></td>
@@ -120,12 +121,12 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="nombreEntrega">*Nombre</label>
-							<input type="text" class="form-control-p" name="nombreEntrega" id="nombreEntrega" value="" required/>
+							<input type="text" class="form-control-p" name="nombreEntrega" id="nombreEntrega" pattern="[A-Za-z ]" value="" required/>
 						</div>
 
 						<div class="form-group">
 							<label for="apellidoEntrega">*Apellido</label>
-							<input type="text" class="form-control-p" name="apellidoEntrega" id="apellidoEntrega" value="" required/>
+							<input type="text" class="form-control-p" name="apellidoEntrega" id="apellidoEntrega" pattern="[A-Za-z ]" value="" required/>
 						</div>
 					</div>
 
@@ -168,7 +169,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="telefonoEntrega">*Teléfono</label>
-							<input type="tel" class="form-control-p" name="telefonoEntrega" id="telefonoEntrega" value="" required/>
+							<input type="text" class="form-control-p" name="telefonoEntrega" id="telefonoEntrega" pattern="[0-9]" value="" required/>
 						</div>
 					</div>		
 			</fieldset>
@@ -199,24 +200,25 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					
 				</div>
 				<!--/- Formulario 02 -->
-				<legend class="text-title-recurrence">Información de entrega</legend>
+				<div class="hidden facturacionForm">
+				<legend class="text-title-recurrence">Información de facturación</legend>
 				<p>
 					Introduzca su dirección de entrega e información aquí
 				</p>
 
 				<!-- Formulario 01 -->
 					<!-- Select one... -->
-				<div class="hidden facturacionForm">
+				
 					<!-- Select one... -->
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="nombreFacturacion">*Nombre</label>
-							<input type="text" class="form-control-p" name="nombreFacturacion" id="nombreFacturacion" value=""/>
+							<input type="text" class="form-control-p" name="nombreFacturacion" id="nombreFacturacion" pattern="[A-Za-z ]" value=""/>
 						</div>
 
 						<div class="form-group">
 							<label for="apellidoFacturacion">*Apellido</label>
-							<input type="text" class="form-control-p" name="apellidoFacturacion" id="apellidoFacturacion"/>
+							<input type="text" class="form-control-p" name="apellidoFacturacion" id="apellidoFacturacion" pattern="[A-Za-z ]"/>
 						</div>
 					</div>
 
@@ -259,7 +261,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="telefonoFacturacion">*Teléfono</label>
-							<input type="tel" class="form-control-p" name="telefonoFacturacion" id="telefonoFacturacion" value="" />
+							<input type="text" class="form-control-p" name="telefonoFacturacion" id="telefonoFacturacion" value="" pattern="[0-9]"/>
 						</div>
 					</div>
 				</div>
@@ -397,14 +399,14 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="numtc">Número de Tarjeta de Crédito</label>
-							<input type="num" class="form-control-p" class="form-control-p" id="numtc" name="numtc">
+							<input type="text" class="form-control-p" class="form-control-p" id="numtc" name="numtc">
 						</div>
 
 						<div class="form-group form-item form-fecha-tc">
 							<label for="ven">Fecha de Vencimiento</label>
 							<div class="clearfix"></div>
-							<input type="datetime" class="form-control-n m-der" maxlength="2" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
-							<input type="num" class="form-control-n" maxlength="4" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
+							<input type="number" class="form-control-n m-der" maxlength="2" min="1" max="12" id="mm" name="mm" placeholder="mm" pattern="[0-9]{2}">
+							<input type="number" class="form-control-n" maxlength="4" min="2018" id="aaaa" name="aaaa"  placeholder="aaaa" pattern="[0-9]{4}">
 							<div class="clearfix"></div>
 						</div>
 					</div>
@@ -412,7 +414,7 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 					<div class="row cont-form">
 						<div class="form-group form-item">
 							<label for="cosec">Código de seguridad <small>(Es el código que se encuentra al respaldo de tu tarjeta de crédito)</small></label>
-							<input type="num" id="cosec" class="form-control-p" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
+							<input type="number" id="cosec" class="form-control-p" min="0" name="cosec" maxlength="3"  pattern="[0-9]{3}" placeholder="123">
 						</div>
 					</div>
 				</div>
@@ -482,8 +484,8 @@ updateLineShipping($orderRecurrence->order_id,$envio);
 	<div class="container">
 		<div class="row">
 			<fieldset class="cont-btns text-center">
-				<button type="submit" class="btn-recurrence-dos">CANCELAR</button>
-				<button type="submit" class="btn-recurrence-dos btn-active">VER ORDEN</button>
+				<button type="button" class="btn-recurrence-dos cancel-recurrence">CANCELAR</button>
+				<button type="button" class="btn-recurrence-dos btn-active comprar-recurrence">VER ORDEN</button>
 			</fieldset>			
 		</div>
 	</div>
